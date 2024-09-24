@@ -1,10 +1,26 @@
 import Foundation
 
-class Enemie{
+class Enemy{
     let name: String
     var fullHp: Int
-    var hp: Int
-    var attack: Int
+    var hp: Int {
+        didSet{
+
+            if hp <= fullHp/2 && oldValue > fullHp / 2 {
+                print("\(name) ist geschwächt")
+            
+            }
+            if hp <= Int((Double(fullHp) * 0.2)) && oldValue > Int((Double(fullHp) * 0.2)) {
+                print("\(name) taumelt!")
+                
+            }
+            if hp <= 0 && oldValue > 0{
+                print("\(name) wurde besiegt")
+                hp = 0
+            }
+        }
+    }
+    var damage: Int
     var defense: Int
     var lvl: Int = 1
     let monsterIndex: Double //Je nach Monster ein Multiplikator
@@ -18,27 +34,28 @@ class Enemie{
         self.name = name
         self.fullHp = Int(Double(lvl * 50 * rare) * monsterIndex)
         self.hp = fullHp
-        self.attack = Int(Double(lvl * 10 * rare) * monsterIndex)
+        self.damage = Int(Double(lvl * 10 * rare) * monsterIndex)
         self.defense = Int(Double(lvl * 1 * rare) * monsterIndex)
         self.rare = rare
         self.souls = Int(Double(lvl * 70 * rare) * monsterIndex)
         self.monsterIndex = monsterIndex
     }
       
-    func increaseLvl(_ addlvl: Int) {
+    func increaseLvl(_ addlvl: Int){
         lvl += addlvl-1
         fullHp = Int(Double(addlvl * 50 * rare) * monsterIndex)
         hp = fullHp
-        attack = Int(Double(addlvl * 10 * rare) * monsterIndex)
+        damage = Int(Double(addlvl * 10 * rare) * monsterIndex)
         defense = Int(Double(addlvl * 1 * rare) * monsterIndex)
         souls = Int(Double(addlvl * 70 * rare) * monsterIndex)
+        
     }
     
     func printDetails() {
         print("Name: \(name)")
         print("Lvl: \(lvl)")
         print("HP: \(hp)")
-        print("Attack: \(attack)")
+        print("Attack: \(damage)")
         print("Defense: \(defense)")
         print("Rare: \(rare)")
         print("Souls: \(souls)")
@@ -46,3 +63,6 @@ class Enemie{
     
     
 }
+
+//leerer Gegner
+let emptyEnemy: Enemy = Enemy(name: "XXX", rare: 1, monsterIndex: 0)

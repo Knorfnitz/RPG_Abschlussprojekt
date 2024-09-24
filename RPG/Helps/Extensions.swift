@@ -1,7 +1,10 @@
 // Erweiterung String um auf Zahlen zu prüfen
 
 extension String {
-    var isNumber: Bool {
+   var isNumber: Bool {
         return !isEmpty && range(of: "^[0-9]+$", options: .regularExpression) != nil
     }
-}
+} // special thanks an autocompleation :D
+
+
+

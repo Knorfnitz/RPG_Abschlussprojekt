@@ -2,15 +2,21 @@ class Hero{
     let name: String
     let fullHp: Int
     var hp: Int{
-        didSet {
-            // Sicherstellen, dass hp nie unter 0 fällt oder über fullHp hinausgeht
-            if hp > fullHp {
-                hp = fullHp
-            } else if hp < 0 {
-                hp = 0
+            didSet {
+                if hp <= fullHp/2 && oldValue > fullHp / 2 {
+                    print("\(name) ist geschwächt")
+                    
+                }
+                if hp <= Int((Double(fullHp) * 0.2)) && oldValue > Int((Double(fullHp) * 0.2)) {
+                    print("\(name) taumelt!")
+                    
+                }
+                if hp <= 0 && oldValue > 0{
+                    print("\(name) wurde besiegt")
+                    hp = 0
+                }
             }
         }
-    }
     let fullMp: Int
     var mp: Int{
         didSet {
@@ -41,9 +47,13 @@ class Hero{
      
     }
     
-    func basicAttack(_ hero: Hero){
-        let damage = self.str - hero.def
-        hero.damage(damage)
+    func basicAttack(_ enemy: Enemy){
+        let damage = self.str - enemy.defense
+        print("\(self.name) greift \(enemy.name) mit einem Basisangriff für \(damage) Schaden an.")
+        //hero.damage(damage)
+        //print(enemie.hp)
+        enemy.hp -= damage
+        //print("Verbleibende HP:\(enemie.hp)") //geheim!
     }
     
     func damage(_ damage: Int){

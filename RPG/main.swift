@@ -3,11 +3,10 @@ import Foundation
 //Grundlegende Variablen
 
 var souls: Int = 200
-var team: [Hero] = []
-var enemieTeam: [Enemie] = []
+var heroTeam: [Hero] = []
+
 
 // Tests:
-
 
 //print(sword1)
 /*print(kirito.weapontype1)
@@ -24,19 +23,6 @@ print(kirito.lvl)
 */
 //kirito.printDetails()
 //print(kirito.basicAttack(rias))
-
-waterSlime.printDetails()
-waterSlime.increaseLvl(5)
-waterSlime.printDetails()
-
-let string1 = "Hello World"
-let string2 = "01234"
-let string3 = "01t"
-print(string1.isNumber)
-print(string2.isNumber)
-print(string3.isNumber) 
-
-
 
 // Startbildschirm
 
@@ -96,7 +82,7 @@ input = readLine()!
         kirito.printDetails()
         print("Kirito wurde gewählt.")
      //   character1 = kirito
-        team.append(kirito)
+        heroTeam.append(kirito)
         print("\nIst das richtige?")
         print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
         input = confirm(readLine()!)
@@ -105,7 +91,7 @@ input = readLine()!
         radagast.printDetails()
         print("Radagast wurde gewählt.")
         //character1 = radagast
-        team.append(radagast)
+        heroTeam.append(radagast)
         print("\nIst das richtige?")
         print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
         input = confirm(readLine()!)
@@ -114,7 +100,7 @@ input = readLine()!
         aragorn.printDetails()
         print("Aragorn wurde gewählt.")
         //character1 = aragorn
-        team.append(aragorn)
+        heroTeam.append(aragorn)
         print("\nIst das richtige?")
         print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
         input = confirm(readLine()!)
@@ -123,7 +109,7 @@ input = readLine()!
         shion.printDetails()
         print("Shion wurde gewählt.")
         //character1 = shion
-        team.append(shion)
+        heroTeam.append(shion)
         print("\nIst das richtige?")
         print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
         input = confirm(readLine()!)
@@ -132,7 +118,7 @@ input = readLine()!
         milim.printDetails()
         print("Shion wurde gewählt.")
         //character1 = milim
-        team.append(milim)
+        heroTeam.append(milim)
         print("\nIst das richtige?")
         print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
         input = confirm(readLine()!)
@@ -141,13 +127,14 @@ input = readLine()!
         rias.printDetails()
         print("Rias wurde gewählt.")
         //character1 = rias
-        team.append(rias)
+        heroTeam.append(rias)
         print("\nIst das richtige?")
         print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
         input = confirm(readLine()!)
         
     default:
         print("Falsche Eingabe...")
+        input = "0"
     }
 }
 
@@ -157,33 +144,7 @@ isEnded = false
 while !isEnded{
     switch menue {
     case "0":
-        print("""
-        ****************************************************************************************
-        *                                                    
-        *                                     Lager:                   
-        *                                                
-        *                                      1. Team              
-        *                                      2. Inventar           
-        *                                      3. Shop               
-        *                                      4. Alle heilen (_ Seelen)        
-        *                                      5. Kampf                            
-        *                                                  
-        *\taktuelles Team:                              
-        *\t\(team[0].name)\t Level:\(team[0].lvl)\t HP:\(team[0].fullHp)\t MP:\(team[0].fullHp)\t Stärke:\(team[0].str)\t Vert.:\(team[0].def)\t Int.:\(team[0].int)\t Gesch.:\(team[0].dex)
-        *  
-        *                                                               
-        *                                                                Seelen:\t \(souls)       
-        ****************************************************************************************
-        """)
-        
-
-
-
-
-        print("Wähle ein Menuepunkt:")
-        print()
-        menue = readLine()!
-       
+        menue = showcampMenu()
         
     case "1":
         print()
@@ -215,7 +176,7 @@ while !isEnded{
         menue = "0"
     case "5":
         print()
-  
+        startLevel()
         print()
         print("Weiter mit Enter!")
         _ = readLine()
