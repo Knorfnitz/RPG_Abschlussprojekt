@@ -10,13 +10,6 @@ func confirm (_ input: String) -> String{
     }
 }
 
-func addCharacter(){
-    
-}
-
-func checkNumber(){
-    
-}
 
 func printLine(){
     print("*************************************************************************\n")
@@ -39,10 +32,11 @@ func readNumber() -> Int {
 }
 
 func showcampMenu()-> String{
+    calculateHealingCost()
     printLine()
  //   printRows(rows: 2)
     print("Lager:\n")
-    print("1. Team\n2. Inventar\n3. Heilen\n4. Shop\n5. Kampf")
+    print("1. Team\n2. Inventar\n3. Heilen (Kosten: \(healingCost) Seelen)\n4. Leveln\n5. Kampf\n4. Shop")
     
     printCurrentTeam(heros: heroTeam)
   //  printRows(rows: 1)
@@ -61,3 +55,143 @@ func printCurrentTeam(heros: [Hero]){
         print("\(i+1): \(heros.name) Level: \(heros.lvl) HP: \(heros.hp)/\(heros.fullHp) MP: \(heros.mp)/\(heros.fullMp) STR: \(heros.str) DEF: \(heros.def) INT: \(heros.int) DEX:\(heros.dex)")
     }
 }
+
+
+
+func createCheatTeam (){
+    heroTeam.append(kirito)
+    heroTeam.append(rias)
+    heroTeam.append(shion)
+    
+    kirito.str = 5000
+    kirito.def = 5000
+    kirito.int = 5000
+    kirito.dex = 5000
+    kirito.fullHp = 10000
+    kirito.hp = 10000
+    kirito.fullMp = 1000
+    kirito.mp = 1000
+    
+    
+    rias.str += 5000
+    rias.def += 5000
+    rias.int += 5000
+    rias.dex += 5000
+    rias.fullHp = 10000
+    rias.hp = 10000
+    rias.fullMp = 1000
+    rias.mp = 1000
+    
+    
+    shion.str += 5000
+    shion.def += 5000
+    shion.int += 5000
+    shion.dex += 5000
+    shion.fullHp = 10000
+    shion.hp = 10000
+    shion.fullMp = 1000
+    shion.mp = 1000
+    
+    kirito.lvl = 99
+    rias.lvl = 99
+    shion.lvl = 99
+    
+    maxLvl = 99
+    
+    souls = 99999
+    
+    potionList[3].amount = 99
+    potionList[7].amount = 99
+}
+
+
+
+
+func chooseHeroForLevelUp(heros: [Hero])-> Hero{
+    printLine()
+    print("Welcher Held möchtest du aufleveln?")
+    printLine()
+    for hero in heros{
+        print("\(hero.name) Lvl: \(hero.lvl)")
+    }
+    printLine()
+    let choice: Int = readNumber()
+    if choice < 1 || choice > heros.count{
+        let hero = heros[choice]
+            return hero
+        }
+    return heros[0]
+    }
+
+
+func levelUp(hero: Hero){
+    let lvlupCost:Int = hero.lvl * 200
+    printLine()
+    print(hero.name)
+    print("Level:  \(hero.lvl)")
+    print("   HP:  \(hero.hp)/\(hero.fullHp)")
+    print("   MP:  \(hero.mp)\(hero.fullMp)")
+    print("    1: Stärke:       \(hero.str)")
+    print("    2: Verteidigung: \(hero.def)")
+    print("    3: Intelligenz:  \(hero.int)")
+    print("    4: Geschick:     \(hero.dex)")
+    print()
+    print("    5: Abbruch")
+    
+    print("Kosten LevelUp:\(lvlupCost)")
+    
+    if souls < lvlupCost{
+        print("Du hast nicht genug Seelen!")
+    }else{
+        
+        var isLvlupInProgress:Bool = true
+        while isLvlupInProgress{
+            
+            print("\nWelchen Wert möchtest du um 5 erhöhen?\n")
+            let input:Int = readNumber()
+            switch input{
+            case 1:
+                hero.str += 5
+                print("Stärke erhöht auf \(hero.str) und du wurdest vollständig geheilt")
+                souls -= lvlupCost
+                hero.fullHp = hero.str * 3 + hero.def * 9
+                hero.fullMp = hero.dex * 1 + hero.int * 3
+                hero.hp = hero.fullHp
+                hero.mp = hero.fullMp
+                hero.lvl += 1
+                isLvlupInProgress = false
+            case 2: hero.def += 5
+                print("Verteidigung erhöht auf \(hero.def) und du wurdest vollständig geheilt")
+                isLvlupInProgress = false
+                souls -= lvlupCost
+                hero.fullHp = hero.str * 3 + hero.def * 9
+                hero.fullMp = hero.dex * 1 + hero.int * 3
+                hero.hp = hero.fullHp
+                hero.mp = hero.fullMp
+                hero.lvl += 1
+            case 3: hero.int += 5
+                print("Intelligenz erhöht auf \(hero.int) und du wurdest vollständig geheilt")
+                isLvlupInProgress = false
+                souls -= lvlupCost
+                hero.fullHp = hero.str * 3 + hero.def * 9
+                hero.fullMp = hero.dex * 1 + hero.int * 3
+                hero.hp = hero.fullHp
+                hero.mp = hero.fullMp
+                hero.lvl += 1
+            case 4: hero.dex += 5
+                print("Geschick erhöht auf \(hero.dex) und du wurdest vollständig geheilt")
+                isLvlupInProgress = false
+                souls -= lvlupCost
+                hero.fullHp = hero.str * 3 + hero.def * 9
+                hero.fullMp = hero.dex * 1 + hero.int * 3
+                hero.hp = hero.fullHp
+                hero.mp = hero.fullMp
+                hero.lvl += 1
+            case 5: isLvlupInProgress = false
+            default:
+                print("Falsche Eingabe!")
+            }
+        }
+    }
+}
+

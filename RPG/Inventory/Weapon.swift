@@ -1,11 +1,12 @@
 struct Weapon{
     let name: String
     let type: WeaponType
-    var extraHP: Int
-    var extraMP: Int
-    var extraSTR: Int
-    var extraDEF: Int
-    var extraINT: Int
-    var extraDEX: Int
-    var element: Element
+    let extraHP: Int
+    let extraMP: Int
+    let extraSTR: Int
+    let extraDEF: Int
+    let extraINT: Int
+    let extraDEX: Int
+    let element: Element
+    var amount: Int = 0
 }

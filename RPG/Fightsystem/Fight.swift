@@ -31,15 +31,22 @@ func startLevel(){
     showLvl()
     let selectedLevel:Int = selectLevel()
     let enemyTeam = generateEnemies(selectedLevel)
+    _ = lvlup(enemyTeam, selectedLevel)
     var fight: Bool = true
     while fight{
         for hero in heroTeam{
             if hero.hp > 0{
                 showEnemiesAndWaitForHeroAction(hero: hero, enemies: enemyTeam)
                 if areAllEnemiesDead(enemyTeam){
-                    print("Du hast alle Gegner besiegt")
-                    //generateLoot(enemies)
-                    //showcampMenu()
+                    print("Du hast alle Gegner besiegt!")
+                    let lootSouls:Int = generateLootsouls(enemies: enemyTeam)
+                    print("Du hast \(lootSouls) Seelen erhalten")
+                    addSouls(lootSouls)
+                    generateLoot(enemies: enemyTeam)
+                    if selectedLevel == maxLvl{
+                        icreaseMaxLevel()
+                        print("Du kannst nun Ebene \(maxLvl) betreten")
+                    }
                     fight = false
                     
                 }
@@ -60,11 +67,28 @@ func startLevel(){
 func generateEnemies(_ level: Int)-> [Enemy]{
     var enemyTeam: [Enemy] = []
     let enemiesCount:Int = Int.random(in: 1...3)
-    for _ in 1...enemiesCount{
-        let index: Int = Int.random(in: 0...availableEnemies.count - 1)
-        enemyTeam.append(availableEnemies[index])
+    let fairnessIndex = if maxLvl < 5 && enemiesCount > 1 { 1 } else { 0 }
+    for _ in 1...enemiesCount - fairnessIndex {
+       
+        enemyTeam.append(availableEnemies[generateEnemyIndexFromRare(enemies: availableEnemies)])
     }
     return enemyTeam
+}
+
+
+func generateEnemyIndexFromRare(enemies: [Enemy]) -> Int {
+    let rarenessArray = enemies.map { 1.0 / Double($0.rare) } // Kehrwert!
+    let totalRarenessValue = rarenessArray.reduce(0, +)
+    let randomValue: Double = Double.random(in: 0...totalRarenessValue)
+    var rareness: Double = 0
+    
+    for (index, rarenessArray) in rarenessArray.enumerated() {
+        rareness += rarenessArray
+        if randomValue < rareness {
+            return index
+        }
+    }
+    return 0
 }
 
 func areAllEnemiesDead(_ enemyTeam: [Enemy])-> Bool{
@@ -86,68 +110,44 @@ func areAllHerosDead(_ heroTeam: [Hero])-> Bool{
 }
 
 
-
-
-
 func showEnemiesAndWaitForHeroAction(hero: Hero, enemies: [Enemy]){
     printLine()
     print("Gegner:")
     for (i, enemy) in enemies.enumerated(){
         print("\(i+1): \(enemy.name) (Level: \(enemy.lvl))")
     }
-    printRows(rows: 3)
-    print("Was soll \(hero.name) tun?")
-    print("1. Standardangriff")
-    print("2. Spezialangriff")
-    print("3. Beutel")
-    printRows(rows: 1)
-    printLine()
-    
-    
-    let heroAction = readNumber()
-   
-    switch heroAction{
-    case 1:
-        let target = chooseEnemy(enemies: enemies)
-        hero.basicAttack(target)
-       break
-    case 2:
-        //specialAttack()
-        break
-    case 3:
-        //openBag()
-        break
-    default:
-        print("Falsche Eingabe")
+    if !areAllEnemiesDead(enemies){
+        printRows(rows: 3)
+        print("Was soll \(hero.name) tun?")
+        print("1. Standardangriff")
+        print("2. Spezialangriff")
+        print("3. Beutel")
+        printRows(rows: 1)
+        printLine()
+        
+        
+        let heroAction = readNumber()
+        
+        switch heroAction{
+        case 1:
+            
+            let target = chooseEnemy(enemies: enemies)
+            hero.basicAttack(target)
+            
+            break
+        case 2:
+            //specialAttack()
+            break
+        case 3:
+            //openBag()
+            break
+        default:
+            print("Falsche Eingabe")
+        }
     }
 }
 
 
-
-    func showSelectActionMenu(){
-    
-}
-/*
-
-    let input: String = readLine()!
-    if input.isNumber {
-        if Int(input)! <= maxLvl{
-                waterSlime.increaseLvl(Int(input)!)
-                goblinwarrior.increaseLvl(Int(input)!)
-                enemieTeam.append(waterSlime)
-                enemieTeam.append(goblinwarrior)
-                //enemieTeam.remove(at: 0)
-                
-                //geh zum kampf
-                gotoFight(heros: heroTeam, enemies: enemieTeam)
-            }else{
-                print("das level ist noch nicht verfügbar")
-            }
-        }else{
-            print("Falsche Eingabe")
-        }
- 
-}*/
 func chooseEnemy (enemies: [Enemy]) -> Enemy{
     if enemies.count > 1{
         print("Welchen Gegner möchtest du angreifen?")
@@ -165,10 +165,12 @@ func chooseEnemy (enemies: [Enemy]) -> Enemy{
 
 func enemiesAction(enemies: [Enemy], heros: [Hero]){
     for enemy in enemies{
-        let aliveHeros:[Hero] = heros.filter{$0.hp > 0}
-        let randomHero: Int = Int.random(in: 0...aliveHeros.count - 1)
-        attackHero(enemy: enemy, hero: heros[randomHero])
-        
+        if enemy.hp > 0{
+            
+            let aliveHeros:[Hero] = heros.filter{$0.hp > 0}
+            let randomHero: Int = Int.random(in: 0...aliveHeros.count - 1)
+            attackHero(enemy: enemy, hero: heros[randomHero])
+        }
     }
 }
 
@@ -179,7 +181,7 @@ func attackHero(enemy: Enemy, hero: Hero){
     }
 
 func restartLevel(heros: [Hero]){
-    souls = 0
+    loseAllSouls()
     for hero in heros{
         hero.hp = hero.fullHp
         hero.mp = hero.fullMp
@@ -188,85 +190,254 @@ func restartLevel(heros: [Hero]){
 
 
 
+func icreaseMaxLevel(){
+    maxLvl += 1
+}
 
+func calculateHealingCost(){
+    if heroTeam.count <= 3 && heroTeam.allSatisfy({ $0.lvl < 5}){
+        healingCost = 0
+        }else{
+            let herosLevelArray = heroTeam.map { $0.lvl }
+            let comulateHerosLevel = herosLevelArray.reduce(0, +)
+            healingCost = comulateHerosLevel * 20
+        }
+    
+}
 
-
-
-
-
-
-
-
-
-/*func gotoFight(heros h:[Hero],enemies e:[Enemy]){
-    var eCopy = e
-    while eCopy.count >= 1{
-        for hero in h{
+func healGroup(){
+    if souls >= healingCost{
+        for hero in heroTeam{
+            hero.hp += hero.fullHp
+            hero.mp += hero.fullMp
             
-            print("""
-            *************************************************************************
-            Deine Gegner:
-
-            """)
-            for (i, enemy) in e.enumerated(){
-                print("\(i+1): \(enemy.name) (Level: \(enemy.lvl))")
-            }
-                                                                                
-            print("""
-                      
-
-
-
-
-
-                                      
-            *************************************************************************
-            """)
+            souls -= healingCost
             
-            if eCopy.count > 1{
-                print("Welchen Gegner möchtest du angreifen")
-                let target: String = readLine()!
-                if target.isNumber{
-                    let targetNumber = Int(target)!
-                    if targetNumber <= eCopy.count{
-                        hero.basicAttack(hero, eCopy[targetNumber])
-                        
-                        if isDead(enemie:eCopy, index: targetNumber-1){
-                            eCopy.remove(at: 0)
-                        }
-                    }else{
-                        print("Falsche Eingabe, es wird automatisch der erste Gegner angegriffen")
-                        hero.basicAttack(hero, eCopy[0])
-                        
-                        if isDead(enemie:eCopy, index: 0){
-                            eCopy.remove(at: 0)
-                        }
-                    }
-                }else{
-                    print("Falsche Eingabe, es wird automatisch der erste Gegner angegriffen")
-                    hero.basicAttack(hero, eCopy[0])
-                  
-                    if isDead(enemie:eCopy, index: 0){
-                        eCopy.remove(at: 0)
-                    }
-                }
-            }else if eCopy.count == 1{
-                hero.basicAttack(hero, eCopy[0])
-                //print(eCopy[0].hp)
-                if isDead(enemie:eCopy, index: 0){
-                    eCopy.remove(at: 0)
-                }
-            }
+            print("Deine Helden wurden geheilt!")
+        }
+    }else{
+            print("Deine Seelen reichen nicht aus, du kannst nicht heilen!")
         }
     }
-    if eCopy.count == 0{
-        print("Du hast gewonnen")
+
+func lvlup(_ enemyTeam: [Enemy], _ selectedLevel: Int) -> [Enemy] {
+    
+    var leveledEnemyTeam: [Enemy] = []
+    for enemy in enemyTeam{
+        enemy.fullHp = Int(Double(selectedLevel * 75 * enemy.rare) * enemy.monsterIndex)
+        enemy.hp = enemy.fullHp
+        enemy.damage = Int(Double(selectedLevel * 8 * enemy.rare) * enemy.monsterIndex)
+        enemy.defense = Int(Double(selectedLevel * 1 * enemy.rare) * enemy.monsterIndex)
+        enemy.souls = Int(Double(selectedLevel * 70 * enemy.rare) * enemy.monsterIndex)
+        enemy.lvl = selectedLevel
+        
+        leveledEnemyTeam.append(enemy)
+    }
+    
+    
+    return leveledEnemyTeam
+}
+
+
+func generateLootsouls(enemies: [Enemy]) -> Int{
+    var souls: Int = 0
+    
+    for enemy in enemies{
+        souls += enemy.souls
+    }
+    
+    return souls
+}
+
+func generateLoot(enemies: [Enemy]) {
+    
+    for enemy in enemies{
+        
+        switch maxLvl{
+        case 1...5:
+            //Für Level 1-5 die drops bestimmen, erst Potions, dann Rüstung, dann Waffen
+            var dropRate:Double = calculateDropChance(enemy: enemy)
+            if dropRate * 2 >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 0 : 4
+                print("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichWeapon: Int = Int.random(in: 0...9)
+                print("\(enemy.name) hat \(inventory.weapons[whichWeapon].name) gedroppt!")
+                inventory.weapons[whichWeapon].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                print("\(enemy.name) hat \(inventory.armors[0].name) gedroppt!")
+                inventory.armors[0].amount += 1
+            }
+            
+        case 6...10:
+            var dropRate:Double = calculateDropChance(enemy: enemy)
+            if dropRate * 2 >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 0 : 4
+                print("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichWeapon: Int = Int.random(in: 10...19)
+                print("\(enemy.name) hat \(inventory.weapons[whichWeapon].name) gedroppt!")
+                inventory.weapons[whichWeapon].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                print("\(enemy.name) hat \(inventory.armors[1].name) gedroppt!")
+                inventory.armors[1].amount += 1
+            }
+        case 11...15:
+            var dropRate:Double = calculateDropChance(enemy: enemy)
+            if dropRate * 2 >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 0 : 4
+                print("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 1 : 5
+                print("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichWeapon: Int = Int.random(in: 10...19)
+                print("\(enemy.name) hat \(inventory.weapons[whichWeapon].name) gedroppt!")
+                inventory.weapons[whichWeapon].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                print("\(enemy.name) hat \(inventory.armors[2].name) gedroppt!")
+                inventory.armors[2].amount += 1
+            }
+        case 16...20:
+            var dropRate:Double = calculateDropChance(enemy: enemy)
+            if dropRate * 2 >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 0 : 4
+                print("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 1 : 5
+                print("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichWeapon: Int = Int.random(in: 10...19)
+                print("\(enemy.name) hat \(inventory.weapons[whichWeapon].name) gedroppt!")
+                inventory.weapons[whichWeapon].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                print("\(enemy.name) hat \(inventory.armors[3].name) gedroppt!")
+                inventory.armors[3].amount += 1
+            }
+        case 21...25:
+            var dropRate:Double = calculateDropChance(enemy: enemy)
+            if dropRate * 2 >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 0 : 4
+                print("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 1 : 5
+                print("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichWeapon: Int = Int.random(in: 10...19)
+                print("\(enemy.name) hat \(inventory.weapons[whichWeapon].name) gedroppt!")
+                inventory.weapons[whichWeapon].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                print("\(enemy.name) hat \(inventory.armors[4].name) gedroppt!")
+                inventory.armors[4].amount += 1
+            }
+        case 26...30:
+            var dropRate:Double = calculateDropChance(enemy: enemy)
+            if dropRate * 2 >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 0 : 4
+                print("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 1 : 5
+                print("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 2 : 6
+                print("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichWeapon: Int = Int.random(in: 10...19)
+                print("\(enemy.name) hat \(inventory.weapons[whichWeapon].name) gedroppt!")
+                inventory.weapons[whichWeapon].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                print("\(enemy.name) hat \(inventory.armors[5].name) gedroppt!")
+                inventory.armors[5].amount += 1
+            }
+        case 31...999:
+            var dropRate:Double = calculateDropChance(enemy: enemy)
+            if dropRate * 2 >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 0 : 4
+                print("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 1 : 5
+                print("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 2 : 6
+                print("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate * 0.5 >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 3 : 7
+                print("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichWeapon: Int = Int.random(in: 10...19)
+                print("\(enemy.name) hat \(inventory.weapons[whichWeapon].name) gedroppt!")
+                inventory.weapons[whichWeapon].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                print("\(enemy.name) hat \(inventory.armors[5].name) gedroppt!")
+                inventory.armors[5].amount += 1
+            }
+        default:
+            print()
+        }
+        
     }
 }
 
-func isDead(enemie e: [Enemy], index i: Int) -> Bool{
-    return e[i].hp <= 0
+func calculateDropChance(enemy: Enemy) -> Double{
+    let dropChance: Double = Double(enemy.rare) * 0.1
+    return dropChance
 }
-*/
-
-

@@ -2,12 +2,13 @@ import Foundation
 
 //Grundlegende Variablen
 
-var souls: Int = 200
 var heroTeam: [Hero] = []
+
+var healingCost: Int = 0
 
 
 // Tests:
-
+//print(availableEnemies[generateEnemyIndexFromRare(enemies: availableEnemies)].name)
 //print(sword1)
 /*print(kirito.weapontype1)
 print(kirito.weapontype2)
@@ -132,6 +133,15 @@ input = readLine()!
         print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
         input = confirm(readLine()!)
         
+    case "99":
+        print("Du bist ein Cheater...\n")
+        createCheatTeam()
+        print("\nDir wird das ultimative Team zur verfügung gestellt...")
+        
+        print("\nDein Lager wird gefüllt...")
+        print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
+        input = confirm(readLine()!)
+        
     default:
         print("Falsche Eingabe...")
         input = "0"
@@ -144,6 +154,7 @@ isEnded = false
 while !isEnded{
     switch menue {
     case "0":
+        calculateHealingCost()
         menue = showcampMenu()
         
     case "1":
@@ -155,21 +166,21 @@ while !isEnded{
         menue = "0"
     case "2":
         print()
-
+        inventory.showInventory()
         print()
         print("Weiter mit Enter!")
         _ = readLine()
         menue = "0"
     case "3":
         print()
-
+        healGroup()
         print()
         print("Weiter mit Enter!")
         _ = readLine()
         menue = "0"
     case "4":
         print()
-
+        levelUp(hero: chooseHeroForLevelUp(heros: heroTeam))
         print()
         print("Weiter mit Enter!")
         _ = readLine()
@@ -183,49 +194,12 @@ while !isEnded{
         menue = "0"
     case "6":
         print()
-       
+        
         print()
         print("Weiter mit Enter!")
         _ = readLine()
         menue = "0"
-    case "7":
-        print()
     
-        print()
-        print("Weiter mit Enter!")
-        _ = readLine()
-        menue = "0"
-    case "8":
-        print()
-
-        print()
-        print("Weiter mit Enter!")
-        _ = readLine()
-        menue = "0"
-    case "9":
-        print()
-
-        print()
-        print("Weiter mit Enter!")
-        _ = readLine()
-        menue = "0"
-    case "10":
-        print()
-        print()
-        print("Weiter mit Enter!")
-        _ = readLine()
-        menue = "0"
-    case "11":
-        print()
-        print()
-        print("Weiter mit Enter!")
-        _ = readLine()
-        menue = "0"
-    case "12":
-        print()
-        print("Das Programm wird beendet")
-        sleep(3)
-        exit(0)
     default:
         print()
         print("Eingabe nicht verfügbar, du wirst zum Hauptmenü weitergeleitet")

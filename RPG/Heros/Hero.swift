@@ -1,6 +1,6 @@
 class Hero{
     let name: String
-    let fullHp: Int
+    var fullHp: Int
     var hp: Int{
             didSet {
                 if hp <= fullHp/2 && oldValue > fullHp / 2 {
@@ -15,9 +15,12 @@ class Hero{
                     print("\(name) wurde besiegt")
                     hp = 0
                 }
+                if hp > fullHp {
+                    hp = fullHp
+                }
             }
         }
-    let fullMp: Int
+    var fullMp: Int
     var mp: Int{
         didSet {
             // Sicherstellen, dass mp nie unter 0 fällt oder über fullMp hinausgeht
@@ -55,22 +58,11 @@ class Hero{
         enemy.hp -= damage
         //print("Verbleibende HP:\(enemie.hp)") //geheim!
     }
+
     
-    func damage(_ damage: Int){
-        self.hp -= damage
-    }
+   
     
-    func heal(_ heal: Int){
-        self.hp += heal
-    }
-    
-    func revive(){
-        self.hp = 100
-    }
-    
-    func lvlup(){
-        
-    }
+ 
     
     func printDetails() {
         print("""

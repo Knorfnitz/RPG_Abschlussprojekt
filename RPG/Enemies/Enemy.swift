@@ -1,7 +1,7 @@
 import Foundation
 
 class Enemy{
-    let name: String
+    var name: String
     var fullHp: Int
     var hp: Int {
         didSet{
@@ -17,6 +17,8 @@ class Enemy{
             if hp <= 0 && oldValue > 0{
                 print("\(name) wurde besiegt")
                 hp = 0
+                let oldName = name
+                name = "XXX \(oldName) wurde besieht XXX"
             }
         }
     }
@@ -34,7 +36,7 @@ class Enemy{
         self.name = name
         self.fullHp = Int(Double(lvl * 50 * rare) * monsterIndex)
         self.hp = fullHp
-        self.damage = Int(Double(lvl * 10 * rare) * monsterIndex)
+        self.damage = Int(Double(lvl * 8 * rare) * monsterIndex)
         self.defense = Int(Double(lvl * 1 * rare) * monsterIndex)
         self.rare = rare
         self.souls = Int(Double(lvl * 70 * rare) * monsterIndex)
