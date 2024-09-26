@@ -31,12 +31,20 @@ func readNumber() -> Int {
     }
 }
 
+func readNumberWithCancelIfCR() -> Int {
+    while true {
+        if let number = readLine(strippingNewline: true), number.isNumber {
+            return Int(number)!
+        }
+    }
+}
+
 func showcampMenu()-> String{
     calculateHealingCost()
     printLine()
  //   printRows(rows: 2)
     print("Lager:\n")
-    print("1. Team\n2. Inventar\n3. Heilen (Kosten: \(healingCost) Seelen)\n4. Leveln\n5. Kampf\n4. Shop")
+    print("1. Team\n2. Inventar\n3. Heilen (Kosten: \(healingCost) Seelen)\n4. Leveln\n5. Kampf\n6. Shop")
     
     printCurrentTeam(heros: heroTeam)
   //  printRows(rows: 1)
@@ -56,12 +64,19 @@ func printCurrentTeam(heros: [Hero]){
     }
 }
 
-
+func waitForInput(){
+    print("Weiter mit Enter!")
+    _ = readLine()
+}
 
 func createCheatTeam (){
     heroTeam.append(kirito)
     heroTeam.append(rias)
     heroTeam.append(shion)
+    
+    availableHerosForBuy.append(radagast)
+    availableHerosForBuy.append(aragorn)
+    availableHerosForBuy.append(milim)
     
     kirito.str = 5000
     kirito.def = 5000
@@ -100,8 +115,29 @@ func createCheatTeam (){
     
     souls = 99999
     
-    potionList[3].amount = 99
-    potionList[7].amount = 99
+    inventory.potions[3].amount = 99
+    inventory.potions[7].amount = 99
+    
+    //potionList[3].amount = 99
+    //potionList[7].amount = 99
+    
+    let amountOfItems: Int = 10
+    
+    inventory.armors[4].increaseAmount(amount: amountOfItems)
+    inventory.armors[5].increaseAmount(amount: amountOfItems)
+    
+    inventory.weapons[20].increaseAmount(amount: amountOfItems)
+    inventory.weapons[21].increaseAmount(amount: amountOfItems)
+    inventory.weapons[22].increaseAmount(amount: amountOfItems)
+    inventory.weapons[23].increaseAmount(amount: amountOfItems)
+    inventory.weapons[24].increaseAmount(amount: amountOfItems)
+    inventory.weapons[25].increaseAmount(amount: amountOfItems)
+    inventory.weapons[26].increaseAmount(amount: amountOfItems)
+    inventory.weapons[27].increaseAmount(amount: amountOfItems)
+    inventory.weapons[28].increaseAmount(amount: amountOfItems)
+    inventory.weapons[29].increaseAmount(amount: amountOfItems)
+    
+    //armorList[5].amount = 10
 }
 
 
@@ -111,13 +147,13 @@ func chooseHeroForLevelUp(heros: [Hero])-> Hero{
     printLine()
     print("Welcher Held möchtest du aufleveln?")
     printLine()
-    for hero in heros{
-        print("\(hero.name) Lvl: \(hero.lvl)")
+    for (i, hero) in heros.enumerated(){
+        print("\(i+1). \(hero.name) Lvl: \(hero.lvl)")
     }
     printLine()
     let choice: Int = readNumber()
-    if choice < 1 || choice > heros.count{
-        let hero = heros[choice]
+    if choice >= 1 || choice <= heros.count{
+        let hero = heros[choice - 1]
             return hero
         }
     return heros[0]
@@ -138,7 +174,7 @@ func levelUp(hero: Hero){
     print()
     print("    5: Abbruch")
     
-    print("Kosten LevelUp:\(lvlupCost)")
+    print("\nKosten LevelUp: \(lvlupCost) Seelen")
     
     if souls < lvlupCost{
         print("Du hast nicht genug Seelen!")

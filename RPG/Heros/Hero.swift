@@ -1,25 +1,29 @@
 class Hero{
+    var weapon: Weapon?
+    let allowedWeaponTypes: [WeaponType]
+    var armor: Armor?
+    
     let name: String
     var fullHp: Int
     var hp: Int{
-            didSet {
-                if hp <= fullHp/2 && oldValue > fullHp / 2 {
-                    print("\(name) ist geschwächt")
-                    
-                }
-                if hp <= Int((Double(fullHp) * 0.2)) && oldValue > Int((Double(fullHp) * 0.2)) {
-                    print("\(name) taumelt!")
-                    
-                }
-                if hp <= 0 && oldValue > 0{
-                    print("\(name) wurde besiegt")
-                    hp = 0
-                }
-                if hp > fullHp {
-                    hp = fullHp
-                }
+        didSet {
+            if hp <= fullHp/2 && oldValue > fullHp / 2 {
+                print("\(name) ist geschwächt")
+                
+            }
+            if hp <= Int((Double(fullHp) * 0.2)) && oldValue > Int((Double(fullHp) * 0.2)) {
+                print("\(name) taumelt!")
+                
+            }
+            if hp <= 0 && oldValue > 0{
+                print("\(name) wurde besiegt")
+                hp = 0
+            }
+            if hp > fullHp {
+                hp = fullHp
             }
         }
+    }
     var fullMp: Int
     var mp: Int{
         didSet {
@@ -37,7 +41,7 @@ class Hero{
     var dex: Int
     var lvl: Int = 1
     
-   init(name: String, str: Int, def: Int, int: Int, dex: Int){
+    init(name: String, str: Int, def: Int, int: Int, dex: Int, allowedWeaponTypes: [WeaponType], weapon: Weapon?, armor: Armor?){
         self.name = name
         self.fullHp = str * 3 + def * 9
         self.hp = fullHp
@@ -47,7 +51,9 @@ class Hero{
         self.def = def
         self.int = int
         self.dex = dex
-     
+        self.allowedWeaponTypes = allowedWeaponTypes
+        self.weapon = weapon
+        self.armor = armor
     }
     
     func basicAttack(_ enemy: Enemy){
@@ -58,9 +64,20 @@ class Hero{
         enemy.hp -= damage
         //print("Verbleibende HP:\(enemie.hp)") //geheim!
     }
+    
+    
+    func swapHeroTeam(){
+        printLine()
+        printCurrentTeam(heros: heroTeam)
+        print()
+        print("Wer soll vertauscht werden?\n")
+        print("Wähle den ersten Helden aus:\n")
+        var chooseHero1ToSwap: Int = readNumber()
+        if chooseHero1ToSwap <= 0 { chooseHero1ToSwap = 1 }
+        
+    }
 
     
-   
     
  
     

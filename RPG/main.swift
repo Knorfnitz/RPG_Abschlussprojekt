@@ -3,6 +3,7 @@ import Foundation
 //Grundlegende Variablen
 
 var heroTeam: [Hero] = []
+var availableHerosForBuy: [Hero] = []
 
 var healingCost: Int = 0
 
@@ -23,7 +24,7 @@ print(kirito.int)
 print(kirito.lvl)
 */
 //kirito.printDetails()
-//print(kirito.basicAttack(rias))
+//myInventory.printMymyInventory()
 
 // Startbildschirm
 
@@ -66,7 +67,7 @@ print("""
 *                                                                       *
 *                           1. Krieger Kirito                           *
 *                           2. Druide Radagast                          *
-*                           3. Waldläufer: Aragorn                      *
+*                           3. Waldläufer Aragorn                       *
 *                           4. Diebin Shion                             *
 *                           5. Heilerin Milim                           *
 *                           6. Zauberin Rias                            *
@@ -82,56 +83,102 @@ input = readLine()!
     case "1":
         kirito.printDetails()
         print("Kirito wurde gewählt.")
-     //   character1 = kirito
-        heroTeam.append(kirito)
         print("\nIst das richtige?")
         print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
         input = confirm(readLine()!)
-        
+        if input == ""{
+            heroTeam.append(kirito)
+            
+            availableHerosForBuy.append(radagast)
+            availableHerosForBuy.append(aragorn)
+            availableHerosForBuy.append(shion)
+            availableHerosForBuy.append(milim)
+            availableHerosForBuy.append(rias)
+            
+        }
     case "2":
         radagast.printDetails()
         print("Radagast wurde gewählt.")
-        //character1 = radagast
-        heroTeam.append(radagast)
         print("\nIst das richtige?")
         print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
         input = confirm(readLine()!)
+        if input == ""{
+            heroTeam.append(radagast)
+            
+            availableHerosForBuy.append(kirito)
+            availableHerosForBuy.append(aragorn)
+            availableHerosForBuy.append(shion)
+            availableHerosForBuy.append(milim)
+            availableHerosForBuy.append(rias)
+            
+        }
         
     case "3":
         aragorn.printDetails()
         print("Aragorn wurde gewählt.")
-        //character1 = aragorn
-        heroTeam.append(aragorn)
         print("\nIst das richtige?")
         print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
         input = confirm(readLine()!)
+        if input == ""{
+            heroTeam.append(aragorn)
+            
+            availableHerosForBuy.append(kirito)
+            availableHerosForBuy.append(radagast)
+            availableHerosForBuy.append(shion)
+            availableHerosForBuy.append(milim)
+            availableHerosForBuy.append(rias)
+            
+        }
         
     case "4":
         shion.printDetails()
         print("Shion wurde gewählt.")
-        //character1 = shion
-        heroTeam.append(shion)
         print("\nIst das richtige?")
         print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
         input = confirm(readLine()!)
-        
+        if input == ""{
+            heroTeam.append(shion)
+            
+            availableHerosForBuy.append(kirito)
+            availableHerosForBuy.append(radagast)
+            availableHerosForBuy.append(aragorn)
+            availableHerosForBuy.append(milim)
+            availableHerosForBuy.append(rias)
+            
+        }
     case "5":
         milim.printDetails()
-        print("Shion wurde gewählt.")
-        //character1 = milim
-        heroTeam.append(milim)
+        print("Milim wurde gewählt.")
         print("\nIst das richtige?")
         print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
         input = confirm(readLine()!)
+        if input == ""{
+            heroTeam.append(milim)
+            
+            availableHerosForBuy.append(kirito)
+            availableHerosForBuy.append(radagast)
+            availableHerosForBuy.append(aragorn)
+            availableHerosForBuy.append(shion)
+            availableHerosForBuy.append(rias)
+            
+        }
         
     case "6":
         rias.printDetails()
         print("Rias wurde gewählt.")
-        //character1 = rias
-        heroTeam.append(rias)
         print("\nIst das richtige?")
         print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
         input = confirm(readLine()!)
+        if input == ""{
+            heroTeam.append(rias)
+            
+            availableHerosForBuy.append(kirito)
+            availableHerosForBuy.append(radagast)
+            availableHerosForBuy.append(aragorn)
+            availableHerosForBuy.append(shion)
+            availableHerosForBuy.append(milim)
+            
+        }
         
     case "99":
         print("Du bist ein Cheater...\n")
@@ -161,43 +208,38 @@ while !isEnded{
         print()
         
         print()
-        print("Weiter mit Enter!")
-        _ = readLine()
+       // print("Weiter mit Enter!")
+       // _ = readLine()
         menue = "0"
     case "2":
         print()
         inventory.showInventory()
         print()
-        print("Weiter mit Enter!")
-        _ = readLine()
+       // print("Weiter mit Enter!")
+        //_ = readLine()
         menue = "0"
     case "3":
         print()
         healGroup()
         print()
-        print("Weiter mit Enter!")
-        _ = readLine()
+
         menue = "0"
     case "4":
         print()
         levelUp(hero: chooseHeroForLevelUp(heros: heroTeam))
         print()
-        print("Weiter mit Enter!")
-        _ = readLine()
+
         menue = "0"
     case "5":
         print()
         startLevel()
         print()
-        print("Weiter mit Enter!")
-        _ = readLine()
+
         menue = "0"
     case "6":
         print()
-        
+        shop.showShop()
         print()
-        print("Weiter mit Enter!")
-        _ = readLine()
         menue = "0"
     
     default:

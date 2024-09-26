@@ -29,23 +29,29 @@ func selectLevel()-> Int{
 
 func startLevel(){
     showLvl()
+    let fightingHeros: [Hero] = Array(heroTeam.prefix(3))
     let selectedLevel:Int = selectLevel()
     let enemyTeam = generateEnemies(selectedLevel)
     _ = lvlup(enemyTeam, selectedLevel)
     var fight: Bool = true
     while fight{
-        for hero in heroTeam{
+        for hero in fightingHeros{
             if hero.hp > 0{
                 showEnemiesAndWaitForHeroAction(hero: hero, enemies: enemyTeam)
                 if areAllEnemiesDead(enemyTeam){
                     print("Du hast alle Gegner besiegt!")
                     let lootSouls:Int = generateLootsouls(enemies: enemyTeam)
                     print("Du hast \(lootSouls) Seelen erhalten")
+                    printLine()
                     addSouls(lootSouls)
                     generateLoot(enemies: enemyTeam)
+                    print("Weiter mit Enter")
+                    _ = readLine()
                     if selectedLevel == maxLvl{
                         icreaseMaxLevel()
-                        print("Du kannst nun Ebene \(maxLvl) betreten")
+                        print("Du kannst nun Ebene \(maxLvl) betreten\n")
+                        print("Weiter mit Enter")
+                        _ = readLine()
                     }
                     fight = false
                     
@@ -218,6 +224,7 @@ func healGroup(){
     }else{
             print("Deine Seelen reichen nicht aus, du kannst nicht heilen!")
         }
+    _ = read
     }
 
 func lvlup(_ enemyTeam: [Enemy], _ selectedLevel: Int) -> [Enemy] {
@@ -262,6 +269,7 @@ func generateLoot(enemies: [Enemy]) {
                 print("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
                 inventory.potions[whichPotion].amount += 1
             }
+            
             dropRate = calculateDropChance(enemy: enemy)
             if dropRate >= Double.random(in: 0...1){
                 let whichWeapon: Int = Int.random(in: 0...9)
