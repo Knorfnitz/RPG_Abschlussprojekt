@@ -206,7 +206,8 @@ while !isEnded{
         
     case "1":
         print()
-        
+        let newHeroOrder: [Hero] = swapHeroTeam(heros: heroTeam)
+        heroTeam = newHeroOrder
         print()
        // print("Weiter mit Enter!")
        // _ = readLine()
@@ -222,7 +223,6 @@ while !isEnded{
         print()
         healGroup()
         print()
-
         menue = "0"
     case "4":
         print()

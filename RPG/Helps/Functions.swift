@@ -78,34 +78,34 @@ func createCheatTeam (){
     availableHerosForBuy.append(aragorn)
     availableHerosForBuy.append(milim)
     
-    kirito.str = 5000
-    kirito.def = 5000
-    kirito.int = 5000
-    kirito.dex = 5000
-    kirito.fullHp = 10000
-    kirito.hp = 10000
-    kirito.fullMp = 1000
-    kirito.mp = 1000
+    kirito.str = 2500
+    kirito.def = 1500
+    kirito.int = 500
+    kirito.dex = 500
+    kirito.fullHp = kirito.str * 3 + kirito.def * 9
+    kirito.hp = kirito.fullHp
+    kirito.fullMp = Int(Double(kirito.dex) * 0.5 + Double(kirito.int) * 2.5)
+    kirito.mp = kirito.fullMp
     
     
-    rias.str += 5000
-    rias.def += 5000
-    rias.int += 5000
-    rias.dex += 5000
-    rias.fullHp = 10000
-    rias.hp = 10000
-    rias.fullMp = 1000
-    rias.mp = 1000
+    rias.str += 500
+    rias.def += 500
+    rias.int += 2500
+    rias.dex += 1500
+    rias.fullHp = rias.str * 3 + rias.def * 9
+    rias.hp = rias.fullHp
+    rias.fullMp = Int(Double(rias.dex) * 0.5 + Double(rias.int) * 2.5)
+    rias.mp = rias.fullMp
     
     
-    shion.str += 5000
-    shion.def += 5000
-    shion.int += 5000
-    shion.dex += 5000
-    shion.fullHp = 10000
-    shion.hp = 10000
-    shion.fullMp = 1000
-    shion.mp = 1000
+    shion.str += 2500
+    shion.def += 500
+    shion.int += 500
+    shion.dex += 1500
+    shion.fullHp = shion.str * 3 + shion.def * 9
+    shion.hp = shion.fullHp
+    shion.fullMp = Int(Double(shion.dex) * 0.5 + Double(shion.int) * 2.5)
+    shion.mp = shion.fullMp
     
     kirito.lvl = 99
     rias.lvl = 99
@@ -231,3 +231,31 @@ func levelUp(hero: Hero){
     }
 }
 
+func swapHeroTeam(heros: [Hero]) -> [Hero]{
+    printLine()
+    printCurrentTeam(heros: heros)
+    print()
+    print("Wer soll vertauscht werden?\n")
+    print("Wähle den ersten Helden aus:\n")
+    var chooseHero1ToSwap: Int = readNumber()
+    print("Wähle den zweiten Helden aus:\n")
+    var chooseHero2ToSwap: Int = readNumber()
+    
+    if chooseHero1ToSwap <= 0 { chooseHero1ToSwap = 1 }
+
+    if chooseHero2ToSwap <= 0 { chooseHero2ToSwap = 1 }
+    
+    if chooseHero1ToSwap <= heros.count && chooseHero2ToSwap <= heros.count {
+        
+        var newHerosToOrder: [Hero] = heros
+        newHerosToOrder.swapAt(chooseHero1ToSwap - 1, chooseHero2ToSwap - 1)
+        
+        return newHerosToOrder
+        
+    }else{
+        print("Kann Eingabe nicht verarbeiten.\n")
+    }
+    
+    return heros
+    
+}

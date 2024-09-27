@@ -1,7 +1,12 @@
-//
-//  Protocols.swift
-//  RPG
-//
-//  Created by Alexander Hasecke on 23.09.24.
-//
+protocol CanUseSpecialAttack {
+    
+    func useSpecialAttack(enemy: Enemy, critRate: Double) -> Bool
+        
+}
 
+
+protocol CanHaveCritDamage {
+    
+    func calculateCritDamage() -> Double
+    
+}

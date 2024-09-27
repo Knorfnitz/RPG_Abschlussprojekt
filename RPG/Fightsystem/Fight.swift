@@ -2,6 +2,8 @@ import Foundation
 
 var maxLvl: Int = 1
 
+var fightingHeros: [Hero] = []
+
 func showLvl(){
     
     printLine()
@@ -29,7 +31,7 @@ func selectLevel()-> Int{
 
 func startLevel(){
     showLvl()
-    let fightingHeros: [Hero] = Array(heroTeam.prefix(3))
+    fightingHeros = Array(heroTeam.prefix(3))
     let selectedLevel:Int = selectLevel()
     let enemyTeam = generateEnemies(selectedLevel)
     _ = lvlup(enemyTeam, selectedLevel)
@@ -134,18 +136,34 @@ func showEnemiesAndWaitForHeroAction(hero: Hero, enemies: [Enemy]){
         
         let heroAction = readNumber()
         
+        var critRate: Double = 1.0
+        
+        if hero is CanHaveCritDamage{
+            let canHaveCritDamage = hero as! CanHaveCritDamage
+            critRate = canHaveCritDamage.calculateCritDamage()
+        }
+        
         switch heroAction{
         case 1:
             
             let target = chooseEnemy(enemies: enemies)
-            hero.basicAttack(target)
+            hero.basicAttack(target, critRate)
             
             break
         case 2:
-            //specialAttack()
+            if !(hero is CanUseSpecialAttack){
+                print("\(hero.name) kann noch keine Spezialattacke")
+                showEnemiesAndWaitForHeroAction(hero: hero, enemies: enemies)
+            }else{
+                let canUseSpecialAttack = hero as! CanUseSpecialAttack
+                let done:Bool = canUseSpecialAttack.useSpecialAttack(enemy: chooseEnemy(enemies: enemies), critRate: critRate)
+                if !done{
+                    showEnemiesAndWaitForHeroAction(hero: hero, enemies: enemies)
+                }
+            }
             break
         case 3:
-            //openBag()
+            showBag(hero: hero)
             break
         default:
             print("Falsche Eingabe")
@@ -182,6 +200,7 @@ func enemiesAction(enemies: [Enemy], heros: [Hero]){
 
 
 func attackHero(enemy: Enemy, hero: Hero){
+
     print("\(enemy.name) greift \(hero.name) mit \(enemy.damage) an")
     hero.hp -= enemy.damage
     }
@@ -191,6 +210,7 @@ func restartLevel(heros: [Hero]){
     for hero in heros{
         hero.hp = hero.fullHp
         hero.mp = hero.fullMp
+        
     }
 }
 
@@ -449,3 +469,56 @@ func calculateDropChance(enemy: Enemy) -> Double{
     let dropChance: Double = Double(enemy.rare) * 0.1
     return dropChance
 }
+
+
+func showBag(hero: Hero){
+        printLine()
+        print("Potions:")
+        
+        let filteredPotionList = inventory.potions.filter { $0.amount > 0}
+        
+        for (i, potion) in filteredPotionList.enumerated() {
+            print("\(i+1).\t\(potion.name)\tAnzahl: \(potion.amount)\t\t Beschreibung: \(potion.description)")
+            print()
+        }
+        if filteredPotionList.count > 0{
+            print("Wähle ein Item (99 für Abbruch)\n")
+            let choosePotionNr = readNumber()
+            if choosePotionNr <= filteredPotionList.count{
+                let choosenPotion = filteredPotionList[choosePotionNr-1]
+                
+                usePotionInBattle(choosenPotion)
+                
+            }
+        }else{
+            print("Keine Potions vorhanden")
+        }
+        printLine()
+    
+}
+
+func usePotionInBattle(_ potion: Potion){
+    print("Bei wem möchtest du \(potion.name) benutzen?\n")
+    printFightingTeam()
+    let chooseHero = readNumber()
+    if chooseHero <= fightingHeros.count{
+        if potion.potionType == 1{
+            fightingHeros[chooseHero-1].hp += potion.amountOfHeal
+            print("\(fightingHeros[chooseHero-1].name)´s HP wurde um \(potion.amountOfHeal) geheilt!")
+            potion.amount -= 1
+        }else{
+            fightingHeros[chooseHero-1].mp += potion.amountOfHeal
+            print("\(fightingHeros[chooseHero-1].name)´MP wurde um \(potion.amountOfHeal) regeneriert!")
+            potion.amount -= 1
+        }
+    }
+}
+
+func printFightingTeam(){
+    for (i, hero) in fightingHeros.enumerated(){
+            
+            print("\(i+1).  \(hero.name)\t HP: (\(hero.hp)/\(hero.fullHp))\t MP: (\(hero.mp)/\(hero.fullMp))\t")
+            
+        }
+    }
+

@@ -40,8 +40,7 @@ class Inventory {
         let filteredPotionList = inventory.potions.filter { $0.amount > 0}
         
         for (i, potion) in filteredPotionList.enumerated() {
-            print("\(i+1).\t\(potion.name)\tAnzahl: \(potion.amount)\tVerkaufspreis: \(potion.sellPrice)")
-            print("Beschreibung: \(potion.description)")
+            print("\(i+1).\t\(potion.name)\tAnzahl: \(potion.amount)\tVerkaufspreis: \(potion.sellPrice)\t\t Beschreibung: \(potion.description)")
             print()
             
         }
@@ -66,8 +65,7 @@ class Inventory {
         let filteredArmorList = inventory.armors.filter { $0.amount > 0}
         
         for (i, armor) in filteredArmorList.enumerated() {
-            print("\(i+1).\t\(armor.name)\tAnzahl: \(armor.amount)\tVerkaufspreis: \(armor.sellPrice)")
-            print("Werte: HP: +\(armor.extraHP) \tDEF: +\(armor.extraDEF)")
+            print("\(i+1).\t\(armor.name)\tAnzahl: \(armor.amount)\tVerkaufspreis: \(armor.sellPrice)\t\t Werte: HP: +\(armor.extraHP) \tDEF: +\(armor.extraDEF)")
             print()
             
         }
@@ -180,7 +178,7 @@ class Inventory {
         let choosenAction = readNumber()
         switch choosenAction{
         case 1:
-            equipWeapon(weapon: weapon)
+            showEquipWeaponDialog(weapon: weapon)
         case 2:
             sellWeapon(weapon: &weapon)
             
@@ -215,7 +213,6 @@ class Inventory {
                 potion.amount -= 1
             }
         }
-        
     }
     
     func showEquipArmorDialog(armor: Armor){
@@ -256,6 +253,15 @@ class Inventory {
         hero.def += armor.extraDEF * modifier
     }
     
+    func addWeaponStats(hero: Hero, weapon: Weapon, modifier: Int){
+        hero.fullHp += weapon.extraHP * modifier
+        hero.fullMp += weapon.extraMP * modifier
+        hero.def += weapon.extraDEF * modifier
+        hero.str += weapon.extraSTR * modifier
+        hero.int += weapon.extraINT * modifier
+        hero.dex += weapon.extraDEX * modifier
+    }
+    
     func chooseHero() -> Hero{
         let inputNumber = readNumber()
         if inputNumber <= heroTeam.count && inputNumber > 0{
@@ -268,40 +274,68 @@ class Inventory {
         }
     }
     
-    func showEquipWeaponDialog(weapon: Armor){
-        printLine()
-        print("Welchem Helden möchtest du die Rüstung \(weapon.name) anziehen?")
-        printHeroTeamForItems()
-        let chosenHero = chooseHero()
-        let currentArmor = chosenHero.armor
-        if currentArmor == nil{
-            chosenHero.armor = weapon
-            addArmorStats(hero: chosenHero, armor: weapon, modifier: 1)
-            let originIndexOfNewArmor = self.armors.firstIndex(where: {$0.name == weapon.name} )
-            self.armors[originIndexOfNewArmor!].amount -= 1
+    func chooseHeroFromArray(array: [Hero]) -> Hero{
+        let inputNumber = readNumber()
+        if inputNumber <= array.count && inputNumber > 0{
+            let hero = array[inputNumber-1]
             
-            
-            print("Du hast \(weapon.name) ausgerüstet!")
-            waitForInput()
+            return hero
         }else{
-            let originIndexOfArmor = self.armors.firstIndex(where: {$0.name == currentArmor!.name} )
-            var originArmor = self.armors[originIndexOfArmor!]
-            originArmor.amount += 1
-            self.armors[originIndexOfArmor!] = originArmor
-            chosenHero.armor = weapon
-            let originIndexOfNewArmor = self.armors.firstIndex(where: {$0.name == weapon.name} )
-            self.armors[originIndexOfNewArmor!].amount -= 1
-            addArmorStats(hero: chosenHero, armor: originArmor, modifier: -1)
-            addArmorStats(hero: chosenHero, armor: weapon, modifier: 1)
-            
-            
-            print("Du hast \(originArmor.name) ins Inventar gelegt und \(weapon.name) ausgerüstet!")
-            waitForInput()
+            print("Falsche Eingabe!")
+            return chooseHeroFromArray(array: array)
         }
-        
     }
     
     
+    func showEquipWeaponDialog(weapon: Weapon){
+        printLine()
+        print("Welchem Helden möchtest du diese Waffe \(weapon.name) geben?")
+        let herosWhoCanEquipWeapon = printHerosWhoCanEquipWeapon(weapon: weapon)
+        if herosWhoCanEquipWeapon.isEmpty{
+            print("Derzeit kann kein Held die Waffe tragen")
+        }else{
+            let chosenHero = chooseHeroFromArray(array: herosWhoCanEquipWeapon)
+            let currentWeapon = chosenHero.weapon
+            if currentWeapon == nil{
+                chosenHero.weapon = weapon
+                addWeaponStats(hero: chosenHero, weapon: weapon, modifier: 1)
+                let originIndexOfNewWeapon = self.weapons.firstIndex(where: {$0.name == weapon.name} )
+                self.weapons[originIndexOfNewWeapon!].amount -= 1
+                
+                print("Du hast \(weapon.name) ausgerüstet!")
+                waitForInput()
+            }else{
+                let originIndexOfWeapon = self.weapons.firstIndex(where: {$0.name == currentWeapon!.name} )
+                var originWeapon = self.weapons[originIndexOfWeapon!]
+                originWeapon.amount += 1
+                self.weapons[originIndexOfWeapon!] = originWeapon
+                chosenHero.weapon = weapon
+                let originIndexOfNewWeapon = self.weapons.firstIndex(where: {$0.name == weapon.name} )
+                self.weapons[originIndexOfNewWeapon!].amount -= 1
+                addWeaponStats(hero: chosenHero, weapon: originWeapon, modifier: -1)
+                addWeaponStats(hero: chosenHero, weapon: weapon, modifier: 1)
+                
+                print("Du hast \(originWeapon.name) ins Inventar gelegt und \(weapon.name) ausgerüstet!")
+                waitForInput()
+            }
+       
+            
+        }
+        
+        
+         
+
+        
+    }
+    
+    func printHerosWhoCanEquipWeapon(weapon: Weapon) -> [Hero]{
+        
+        let filteredHeroListForWeaponType = heroTeam.filter { $0.allowedWeaponTypes.contains(weapon.type) }
+        for (i, hero) in filteredHeroListForWeaponType.enumerated(){
+            print("\(i+1). \(hero.name)")
+        }
+        return filteredHeroListForWeaponType
+    }
     
     func equipWeapon(weapon: Weapon){
         

@@ -45,7 +45,7 @@ class Hero{
         self.name = name
         self.fullHp = str * 3 + def * 9
         self.hp = fullHp
-        self.fullMp = dex * 1 + int * 3
+        self.fullMp = Int(Double(dex) * 0.5 + Double(int) * 2.5)
         self.mp = fullMp
         self.str = str
         self.def = def
@@ -56,26 +56,24 @@ class Hero{
         self.armor = armor
     }
     
-    func basicAttack(_ enemy: Enemy){
-        let damage = self.str - enemy.defense
-        print("\(self.name) greift \(enemy.name) mit einem Basisangriff für \(damage) Schaden an.")
-        //hero.damage(damage)
-        //print(enemie.hp)
-        enemy.hp -= damage
-        //print("Verbleibende HP:\(enemie.hp)") //geheim!
-    }
-    
-    
-    func swapHeroTeam(){
-        printLine()
-        printCurrentTeam(heros: heroTeam)
-        print()
-        print("Wer soll vertauscht werden?\n")
-        print("Wähle den ersten Helden aus:\n")
-        var chooseHero1ToSwap: Int = readNumber()
-        if chooseHero1ToSwap <= 0 { chooseHero1ToSwap = 1 }
+    func basicAttack(_ enemy: Enemy, _ critRate: Double){
         
+        var damage = Int(Double(self.str - enemy.defense) * critRate)
+        
+        if damage <= 0 {
+            damage = 0
+            print("\(enemy.name) ist zu stark und nimmt keinen Schaden!")
+        }else{
+            print("\(self.name) greift \(enemy.name) mit einem Basisangriff für \(damage) Schaden an.\n")
+            if critRate > 1 {
+                print("Der Angriff war kritisch!")
+            }
+        }
+        enemy.hp -= damage
+    
     }
+    
+
 
     
     
