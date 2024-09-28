@@ -29,6 +29,33 @@ class Shop{
         }
         
     }
+    func showShopForTerminal(){
+        let showShopforTerminalTopic = "Willkommen im Shop:"
+        let showShopforTerminalStringArray: [String] = [
+            "[1] Potions",
+            "[2] Helden",
+            voidString,
+            "[9] Abbruch",
+            voidString,
+            voidString,
+            "Wähle eine Kategorie"
+        ]
+        generateTerminalWindowWithSouls(topic: showShopforTerminalTopic, printArray: showShopforTerminalStringArray, in: terminalWidth)
+        
+        let choosenCategory: Int = readNumber()
+        
+        switch choosenCategory {
+        case 1:
+            showShopPotionsForTerminal()
+        case 2:
+            showShopHerosForTerminal()
+        case 9:
+            break
+        default:
+            break
+        }
+        
+    }
     
     func showShopPotions(){
         printLine()
@@ -46,6 +73,25 @@ class Shop{
             buyPotions(potion: potionList[choosenPotion-1])
         }else{
             print("falsche Eingabe")
+        }
+    }
+    
+    func showShopPotionsForTerminal(){
+        let showShopPotionsForTerminalTopic = "Potion Shop"
+        var showShopPotionsForTerminalStringArray: [String] = []
+        
+        for (i, potion) in potionList.enumerated(){
+            showShopPotionsForTerminalStringArray.append("[\(i+1)]. \(potion.name) - \(potion.price)")
+            showShopPotionsForTerminalStringArray.append("\(potion.description)")
+        }
+        
+        showShopPotionsForTerminalStringArray.append("Wähle eine Potion: (Abbruch mit [99])")
+        generateTerminalWindowWithSouls(topic: showShopPotionsForTerminalTopic, printArray: showShopPotionsForTerminalStringArray, in: terminalWidth)
+        
+        let choosenPotion: Int = readNumber()
+        
+        if choosenPotion <= potionList.count && choosenPotion > 0{
+            buyPotionsForTerminal(potion: potionList[choosenPotion-1])
         }
     }
     
@@ -78,14 +124,83 @@ class Shop{
                 print("Du hast nicht genug Seelen.\n")
                 printLine()
             }
-        
-        
-            
         }else{
             print("Du hast bereits alle Helden gekauft")
         }
-        
     }
+    
+    
+    func showShopHerosForTerminal(){
+        let showShopHerosForTerminalTopic = "Helden Shop"
+        var showShopHerosForTerminalArrayString: [String] = []
+    
+        if availableHerosForBuy.count > 0{
+            showShopHerosForTerminalArrayString.append("Verfügbare Helden:")
+            showShopHerosForTerminalArrayString.append(voidString)
+            
+            for (i, hero) in availableHerosForBuy.enumerated(){
+                showShopHerosForTerminalArrayString.append("[\(i+1)] \(hero.name)")
+                showShopHerosForTerminalArrayString.append(voidString)
+            }
+            showShopHerosForTerminalArrayString.append(voidString)
+            showShopHerosForTerminalArrayString.append("Der nächste Held kosten \(calculateHeroPrice()) Seelen.")
+            showShopHerosForTerminalArrayString.append(voidString)
+            
+            if souls > calculateHeroPrice(){
+                showShopHerosForTerminalArrayString.append("Welchen Helden möchtest du kaufen?")
+                
+                generateTerminalWindowWithSouls(topic: showShopHerosForTerminalTopic, printArray: showShopHerosForTerminalArrayString, in: terminalWidth)
+                
+                let chooseHeroToBuy: Int = readNumber()
+                
+                if chooseHeroToBuy <= availableHerosForBuy.count && chooseHeroToBuy > 0{
+                    
+                    souls -= calculateHeroPrice()
+                    let buyedHero = availableHerosForBuy[chooseHeroToBuy-1]
+                    heroTeam.append(buyedHero)
+                    availableHerosForBuy.remove(at: chooseHeroToBuy-1)
+                    
+                    showShopHerosForTerminalArrayString = []
+                    showShopHerosForTerminalArrayString.append(voidString)
+                    showShopHerosForTerminalArrayString.append(voidString)
+                    showShopHerosForTerminalArrayString.append(voidString)
+                    showShopHerosForTerminalArrayString.append("Herzlichen Glückwunsch!")
+                    showShopHerosForTerminalArrayString.append("\(buyedHero.name) tritt deinem Team bei.")
+                    showShopHerosForTerminalArrayString.append(voidString)
+                    showShopHerosForTerminalArrayString.append(enterString)
+                    
+                    generateTerminalWindowWithSoulAndCenterd(topic: showShopHerosForTerminalTopic, printArray: showShopHerosForTerminalArrayString, in: terminalWidth)
+                    _ = readLine()
+                }
+                
+            }else{
+                showShopHerosForTerminalArrayString = []
+                showShopHerosForTerminalArrayString.append(voidString)
+                showShopHerosForTerminalArrayString.append(voidString)
+                showShopHerosForTerminalArrayString.append(voidString)
+                showShopHerosForTerminalArrayString.append("Du hast nicht genug Seelen.")
+                showShopHerosForTerminalArrayString.append(voidString)
+                showShopHerosForTerminalArrayString.append("Der nächste Held kostet \(calculateHeroPrice()) Seelen.")
+                showShopHerosForTerminalArrayString.append(voidString)
+                showShopHerosForTerminalArrayString.append(enterString)
+                
+                generateTerminalWindowWithSoulAndCenterd(topic: showShopHerosForTerminalTopic, printArray: showShopHerosForTerminalArrayString, in: terminalWidth)
+                _ = readLine()
+            }
+        }else{
+            showShopHerosForTerminalArrayString = []
+            showShopHerosForTerminalArrayString.append(voidString)
+            showShopHerosForTerminalArrayString.append(voidString)
+            showShopHerosForTerminalArrayString.append(voidString)
+            showShopHerosForTerminalArrayString.append("Du hast bereits alle Helden gekauft")
+            showShopHerosForTerminalArrayString.append(voidString)
+            showShopHerosForTerminalArrayString.append(enterString)
+            
+            generateTerminalWindowWithSoulAndCenterd(topic: showShopHerosForTerminalTopic, printArray: showShopHerosForTerminalArrayString, in: terminalWidth)
+            _ = readLine()
+        }
+    }
+    
     
     func buyPotions(potion: Potion){
         print("Die \(potion.name) kostet \(potion.price) Seelen.\n")
@@ -107,6 +222,54 @@ class Shop{
         else{
             print("Du hast nicht genug Seelen. Weiter mit Enter\n")
             _ = readLine()
+        }
+        
+    }
+    
+    func buyPotionsForTerminal(potion: Potion){
+        let buyPotionsForTerminalTopic = "Potion kaufen"
+        var buyPotionsForTerminalStringArray: [String] = [
+        "Die \(potion.name) kostet \(potion.price) Seelen.",
+        voidString,
+        voidString,
+        "Wie viele möchtest du kaufen? (Keine = [0])"
+        ]
+        
+        generateTerminalWindowWithSoulAndCenterd(topic: buyPotionsForTerminalTopic, printArray: buyPotionsForTerminalStringArray, in: terminalWidth)
+        
+        let amountOfBuyingPotions = readNumber()
+        
+        let price = amountOfBuyingPotions * potion.price
+        
+        if price <= souls{
+            souls -= price
+            potion.amount += amountOfBuyingPotions
+            
+            buyPotionsForTerminalStringArray = []
+            buyPotionsForTerminalStringArray.append(voidString)
+            buyPotionsForTerminalStringArray.append(voidString)
+            buyPotionsForTerminalStringArray.append(voidString)
+            buyPotionsForTerminalStringArray.append("Du hast \(amountOfBuyingPotions) \(potion.name)")
+            buyPotionsForTerminalStringArray.append(voidString)
+            buyPotionsForTerminalStringArray.append("für \(price) Seelen gekauft")
+            buyPotionsForTerminalStringArray.append(voidString)
+            buyPotionsForTerminalStringArray.append(enterString)
+        
+            generateTerminalWindowWithSoulAndCenterd(topic: buyPotionsForTerminalTopic, printArray: buyPotionsForTerminalStringArray, in: terminalWidth)
+            _ = readLine()
+            }
+        else{
+            buyPotionsForTerminalStringArray = []
+            buyPotionsForTerminalStringArray.append(voidString)
+            buyPotionsForTerminalStringArray.append(voidString)
+            buyPotionsForTerminalStringArray.append(voidString)
+            buyPotionsForTerminalStringArray.append("Du hast nicht genug Seelen")
+            buyPotionsForTerminalStringArray.append(voidString)
+            buyPotionsForTerminalStringArray.append(enterString)
+        
+            generateTerminalWindowWithSoulAndCenterd(topic: buyPotionsForTerminalTopic, printArray: buyPotionsForTerminalStringArray, in: terminalWidth)
+            _ = readLine()
+            
         }
         
     }

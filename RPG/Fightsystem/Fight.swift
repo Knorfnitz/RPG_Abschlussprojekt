@@ -12,6 +12,29 @@ func showLvl(){
     printLine()
     
 }
+func showLvlForTerminal(_ fightingHeros: [Hero]){
+    
+    let showLvlForTerminalTopic: String = "Dungeon"
+    var showLvlForTerminalStringArray: [String] = [
+        voidString,
+        voidString,
+        voidString,
+        "Wähle eine Ebene:",
+        voidString,
+        "Deine maximale Ebene ist: \(maxLvl)"
+    ]
+    showLvlForTerminalStringArray.append(voidString)
+    showLvlForTerminalStringArray.append(voidString)
+    showLvlForTerminalStringArray.append(voidString)
+    for (i, hero) in fightingHeros.enumerated(){
+        showLvlForTerminalStringArray.append("[\(i)] \(hero.name) Lvl: \(hero.lvl)  HP: \(hero.hp)/\(hero.fullHp)  MP: \(hero.mp)/\(hero.fullMp)")
+        showLvlForTerminalStringArray.append(voidString)
+    }
+    
+    generateTerminalWindowWithSouls(topic: showLvlForTerminalTopic, printArray: showLvlForTerminalStringArray, in: terminalWidth)
+    
+}
+
 
 func selectLevel()-> Int{
     while true{
@@ -28,13 +51,86 @@ func selectLevel()-> Int{
     }
 }
 
+func selectLevelForTerminal()-> Int{
+    while true{
+        
+        let selectLevel = readLine()!
+        if selectLevel.isNumber{
+            let selectedLevel: Int = Int(selectLevel)!
+            if selectedLevel <= maxLvl && selectedLevel > 0{
+                return selectedLevel
+            }else{
+                let selectLevelArray: [String] = [
+                    voidString,
+                    voidString,
+                    voidString,
+                    "Diese Ebene ist noch nicht verfügbar",
+                    voidString,
+                    "Deine maximale Ebene ist: \(maxLvl)",
+                    voidString,
+                    voidString,
+                    enterString
+                ]
+                generateTerminalWindowWithSoulAndCenterd(topic: "Ebene nicht verfügbar!", printArray: selectLevelArray, in: terminalWidth)
+                
+            }
+        }
+    }
+}
+
 
 func startLevel(){
-    showLvl()
+    
     fightingHeros = Array(heroTeam.prefix(3))
+    showLvl()
     let selectedLevel:Int = selectLevel()
     let enemyTeam = generateEnemies(selectedLevel)
-    _ = lvlup(enemyTeam, selectedLevel)
+    _ = lvlupEnemies(enemyTeam, selectedLevel)
+    var fight: Bool = true
+    while fight{
+        for hero in fightingHeros{
+            if hero.hp > 0{
+                showEnemiesAndWaitForHeroAction(hero: hero, enemies: enemyTeam)
+                if areAllEnemiesDead(enemyTeam){
+                    print("Du hast alle Gegner besiegt!")
+                    let lootSouls:Int = generateLootsouls(enemies: enemyTeam)
+                    print("Du hast \(lootSouls) Seelen erhalten")
+                    printLine()
+                    addSouls(lootSouls)
+                    generateLoot(enemies: enemyTeam)
+                    print("Weiter mit Enter")
+                    _ = readLine()
+                    if selectedLevel == maxLvl{
+                        icreaseMaxLevel()
+                        print("Du kannst nun Ebene \(maxLvl) betreten\n")
+                        print("Weiter mit Enter")
+                        _ = readLine()
+                    }
+                    fight = false
+                    
+                }
+            }
+        }
+        if fight {
+            enemiesAction(enemies: enemyTeam, heros: heroTeam)
+            
+            if areAllHerosDead(heroTeam){
+                print("Du hast verloren")
+                restartLevel(heros: heroTeam)
+                fight = false
+            }
+        }
+    }
+}
+
+func startLevelForTerminal(){
+    fightingHeros = Array(heroTeam.prefix(3))
+    showLvlForTerminal(fightingHeros)
+    
+    let selectedLevel:Int = selectLevel()
+    
+    let enemyTeam = generateEnemies(selectedLevel)
+    _ = lvlupEnemies(enemyTeam, selectedLevel)
     var fight: Bool = true
     while fight{
         for hero in fightingHeros{
@@ -133,6 +229,7 @@ func showEnemiesAndWaitForHeroAction(hero: Hero, enemies: [Enemy]){
         printRows(rows: 1)
         printLine()
         
+        var isHeroNotFinish:Bool = false
         
         let heroAction = readNumber()
         
@@ -163,10 +260,72 @@ func showEnemiesAndWaitForHeroAction(hero: Hero, enemies: [Enemy]){
             }
             break
         case 3:
-            showBag(hero: hero)
-            break
+            isHeroNotFinish = showBag(hero: hero)
+            if isHeroNotFinish{
+                showEnemiesAndWaitForHeroAction(hero: hero, enemies: enemies)
+            }
         default:
             print("Falsche Eingabe")
+            showEnemiesAndWaitForHeroAction(hero: hero, enemies: enemies)
+        }
+    }
+}
+
+
+func showEnemiesAndWaitForHeroActionForTerminal(hero: Hero, enemies: [Enemy]){
+    let terminalSize // generate fightWindow
+    printLine()
+    print("Gegner:")
+    for (i, enemy) in enemies.enumerated(){
+        print("\(i+1): \(enemy.name) (Level: \(enemy.lvl))")
+    }
+    if !areAllEnemiesDead(enemies){
+        printRows(rows: 3)
+        print("Was soll \(hero.name) tun?")
+        print("1. Standardangriff")
+        print("2. Spezialangriff")
+        print("3. Beutel")
+        printRows(rows: 1)
+        printLine()
+        
+        var isHeroNotFinish:Bool = false
+        
+        let heroAction = readNumber()
+        
+        var critRate: Double = 1.0
+        
+        if hero is CanHaveCritDamage{
+            let canHaveCritDamage = hero as! CanHaveCritDamage
+            critRate = canHaveCritDamage.calculateCritDamage()
+        }
+        
+        switch heroAction{
+        case 1:
+            
+            let target = chooseEnemy(enemies: enemies)
+            hero.basicAttack(target, critRate)
+            
+            break
+        case 2:
+            if !(hero is CanUseSpecialAttack){
+                print("\(hero.name) kann noch keine Spezialattacke")
+                showEnemiesAndWaitForHeroAction(hero: hero, enemies: enemies)
+            }else{
+                let canUseSpecialAttack = hero as! CanUseSpecialAttack
+                let done:Bool = canUseSpecialAttack.useSpecialAttack(enemy: chooseEnemy(enemies: enemies), critRate: critRate)
+                if !done{
+                    showEnemiesAndWaitForHeroAction(hero: hero, enemies: enemies)
+                }
+            }
+            break
+        case 3:
+            isHeroNotFinish = showBag(hero: hero)
+            if isHeroNotFinish{
+                showEnemiesAndWaitForHeroAction(hero: hero, enemies: enemies)
+            }
+        default:
+            print("Falsche Eingabe")
+            showEnemiesAndWaitForHeroAction(hero: hero, enemies: enemies)
         }
     }
 }
@@ -247,7 +406,38 @@ func healGroup(){
     _ = read
     }
 
-func lvlup(_ enemyTeam: [Enemy], _ selectedLevel: Int) -> [Enemy] {
+func healGroupForTerminal(){
+    var healGroupForTerminalStringArray: [String] = []
+    let healGroupForTerminalTopic: String = "Heilung"
+    
+    if souls >= healingCost{
+        souls -= healingCost
+        healGroupForTerminalStringArray.append(voidString)
+        healGroupForTerminalStringArray.append(voidString)
+        healGroupForTerminalStringArray.append(voidString)
+        healGroupForTerminalStringArray.append("Deine Helden wurden geheilt!")
+        
+        generateTerminalWindowWithSouls(topic: healGroupForTerminalTopic, printArray: healGroupForTerminalStringArray, in: terminalWidth)
+        _ = readLine()
+        
+        for hero in heroTeam{
+            hero.hp += hero.fullHp
+            hero.mp += hero.fullMp
+            
+        }
+    }else{
+        healGroupForTerminalStringArray.append(voidString)
+        healGroupForTerminalStringArray.append(voidString)
+        healGroupForTerminalStringArray.append(voidString)
+        healGroupForTerminalStringArray.append("Deine Seelen reichen nicht aus, du kannst nicht heilen!")
+        
+        generateTerminalWindowWithSouls(topic: healGroupForTerminalTopic, printArray: healGroupForTerminalStringArray, in: terminalWidth)
+        _ = readLine()
+        }
+    
+    }
+
+func lvlupEnemies(_ enemyTeam: [Enemy], _ selectedLevel: Int) -> [Enemy] {
     
     var leveledEnemyTeam: [Enemy] = []
     for enemy in enemyTeam{
@@ -471,7 +661,7 @@ func calculateDropChance(enemy: Enemy) -> Double{
 }
 
 
-func showBag(hero: Hero){
+func showBag(hero: Hero) -> Bool{
         printLine()
         print("Potions:")
         
@@ -484,9 +674,11 @@ func showBag(hero: Hero){
         if filteredPotionList.count > 0{
             print("Wähle ein Item (99 für Abbruch)\n")
             let choosePotionNr = readNumber()
-            if choosePotionNr <= filteredPotionList.count{
+            if choosePotionNr <= filteredPotionList.count && choosePotionNr > 0{
                 let choosenPotion = filteredPotionList[choosePotionNr-1]
-                
+                if choosePotionNr >= filteredPotionList.count  {
+                    return true
+                }
                 usePotionInBattle(choosenPotion)
                 
             }
@@ -494,7 +686,7 @@ func showBag(hero: Hero){
             print("Keine Potions vorhanden")
         }
         printLine()
-    
+    return true
 }
 
 func usePotionInBattle(_ potion: Potion){

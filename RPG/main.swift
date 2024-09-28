@@ -7,6 +7,13 @@ var availableHerosForBuy: [Hero] = []
 
 var healingCost: Int = 0
 
+var isEnded: Bool = false
+
+let enterString: String = "Drücke Enter für weiter"
+
+let terminalWidth: Int = 92
+
+
 
 // Tests:
 //print(availableEnemies[generateEnemyIndexFromRare(enemies: availableEnemies)].name)
@@ -28,225 +35,77 @@ print(kirito.lvl)
 
 // Startbildschirm
 
-print("""
-*************************************************************************
-*                   ######     ##    ######## #######                   *
-*                   ##  ##    ####   #  ##  #  ##  ##                   *
-*                   ##       ##  ##     ##     ##                       *
-*                   ####     ######     ##     ####                     *
-*                   ##       ##  ##     ##     ##                       *
-*                   ##       ##  ##     ##     ##  ##                   *
-*                  ####      ##  ##    ####   #######                   *
-*                                                                       *
-*                                                                       *
-*                                                                       *
-*                       Spiel starten mit Enter                         *
-*                                                                       *
-*                                                                       *
-*                                                                       *
-*************************************************************************
-""")
+let GlobalTerminal: Int = 1
+scaleTerminal()
 _ = readLine()
-
-// Characterwahl
-var isEnded: Bool = false
-
-
-//var character1: AnyObject
-var input: String = "0"
-
-while !isEnded{
-
-    switch input {
-case "0":
-
-print("""
-*************************************************************************
-*                                                                       *
-*                      Wähle deinen Start-Helden:                       *
-*                                                                       *
-*                           1. Krieger Kirito                           *
-*                           2. Druide Radagast                          *
-*                           3. Waldläufer Aragorn                       *
-*                           4. Diebin Shion                             *
-*                           5. Heilerin Milim                           *
-*                           6. Zauberin Rias                            *
-*                                                                       *
-*                                                                       *
-*                                                                       *
-*                                                                       *
-*                                                                       *
-*************************************************************************
-""")
-input = readLine()!
+//openGate()
+//startScreen(terminal: GlobalTerminal)
+//_ = readLine()
     
-    case "1":
-        kirito.printDetails()
-        print("Kirito wurde gewählt.")
-        print("\nIst das richtige?")
-        print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
-        input = confirm(readLine()!)
-        if input == ""{
-            heroTeam.append(kirito)
-            
-            availableHerosForBuy.append(radagast)
-            availableHerosForBuy.append(aragorn)
-            availableHerosForBuy.append(shion)
-            availableHerosForBuy.append(milim)
-            availableHerosForBuy.append(rias)
-            
-        }
-    case "2":
-        radagast.printDetails()
-        print("Radagast wurde gewählt.")
-        print("\nIst das richtige?")
-        print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
-        input = confirm(readLine()!)
-        if input == ""{
-            heroTeam.append(radagast)
-            
-            availableHerosForBuy.append(kirito)
-            availableHerosForBuy.append(aragorn)
-            availableHerosForBuy.append(shion)
-            availableHerosForBuy.append(milim)
-            availableHerosForBuy.append(rias)
-            
-        }
-        
-    case "3":
-        aragorn.printDetails()
-        print("Aragorn wurde gewählt.")
-        print("\nIst das richtige?")
-        print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
-        input = confirm(readLine()!)
-        if input == ""{
-            heroTeam.append(aragorn)
-            
-            availableHerosForBuy.append(kirito)
-            availableHerosForBuy.append(radagast)
-            availableHerosForBuy.append(shion)
-            availableHerosForBuy.append(milim)
-            availableHerosForBuy.append(rias)
-            
-        }
-        
-    case "4":
-        shion.printDetails()
-        print("Shion wurde gewählt.")
-        print("\nIst das richtige?")
-        print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
-        input = confirm(readLine()!)
-        if input == ""{
-            heroTeam.append(shion)
-            
-            availableHerosForBuy.append(kirito)
-            availableHerosForBuy.append(radagast)
-            availableHerosForBuy.append(aragorn)
-            availableHerosForBuy.append(milim)
-            availableHerosForBuy.append(rias)
-            
-        }
-    case "5":
-        milim.printDetails()
-        print("Milim wurde gewählt.")
-        print("\nIst das richtige?")
-        print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
-        input = confirm(readLine()!)
-        if input == ""{
-            heroTeam.append(milim)
-            
-            availableHerosForBuy.append(kirito)
-            availableHerosForBuy.append(radagast)
-            availableHerosForBuy.append(aragorn)
-            availableHerosForBuy.append(shion)
-            availableHerosForBuy.append(rias)
-            
-        }
-        
-    case "6":
-        rias.printDetails()
-        print("Rias wurde gewählt.")
-        print("\nIst das richtige?")
-        print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
-        input = confirm(readLine()!)
-        if input == ""{
-            heroTeam.append(rias)
-            
-            availableHerosForBuy.append(kirito)
-            availableHerosForBuy.append(radagast)
-            availableHerosForBuy.append(aragorn)
-            availableHerosForBuy.append(shion)
-            availableHerosForBuy.append(milim)
-            
-        }
-        
-    case "99":
-        print("Du bist ein Cheater...\n")
-        createCheatTeam()
-        print("\nDir wird das ultimative Team zur verfügung gestellt...")
-        
-        print("\nDein Lager wird gefüllt...")
-        print("Weiter mit Enter... oder Abbrechen mit belibiger Eingabe.")
-        input = confirm(readLine()!)
-        
-    default:
-        print("Falsche Eingabe...")
-        input = "0"
-    }
-}
+    // Characterwahl
 
-var menue: String? = "0"
-isEnded = false
-
-while !isEnded{
-    switch menue {
-    case "0":
-        calculateHealingCost()
-        menue = showcampMenu()
-        
-    case "1":
-        print()
-        let newHeroOrder: [Hero] = swapHeroTeam(heros: heroTeam)
-        heroTeam = newHeroOrder
-        print()
-       // print("Weiter mit Enter!")
-       // _ = readLine()
-        menue = "0"
-    case "2":
-        print()
-        inventory.showInventory()
-        print()
-       // print("Weiter mit Enter!")
-        //_ = readLine()
-        menue = "0"
-    case "3":
-        print()
-        healGroup()
-        print()
-        menue = "0"
-    case "4":
-        print()
-        levelUp(hero: chooseHeroForLevelUp(heros: heroTeam))
-        print()
-
-        menue = "0"
-    case "5":
-        print()
-        startLevel()
-        print()
-
-        menue = "0"
-    case "6":
-        print()
-        shop.showShop()
-        print()
-        menue = "0"
     
-    default:
-        print()
-        print("Eingabe nicht verfügbar, du wirst zum Hauptmenü weitergeleitet")
-        sleep(2)
-        menue = "0"
-        
+let chosenHero: String = choseStartCharacterWindow(terminal: GlobalTerminal)
+
+
+choseStartCharacter(terminal: GlobalTerminal, hero: chosenHero)
+
+
+campMenu(terminal: GlobalTerminal)
+ /*
+    var menue: String? = "0"
+    isEnded = false
+    
+    while !isEnded{
+        switch menue {
+        case "0":
+            calculateHealingCost()
+            menue = showcampMenu()
+            
+        case "1":
+            print()
+            let newHeroOrder: [Hero] = swapHeroTeam(heros: heroTeam)
+            heroTeam = newHeroOrder
+            print()
+            // print("Weiter mit Enter!")
+            // _ = readLine()
+            menue = "0"
+        case "2":
+            print()
+            inventory.showInventory()
+            print()
+            // print("Weiter mit Enter!")
+            //_ = readLine()
+            menue = "0"
+        case "3":
+            print()
+            healGroup()
+            print()
+            menue = "0"
+        case "4":
+            print()
+            levelUp(hero: chooseHeroForLevelUp(heros: heroTeam))
+            print()
+            
+            menue = "0"
+        case "5":
+            print()
+            startLevel()
+            print()
+            
+            menue = "0"
+        case "6":
+            print()
+            shop.showShop()
+            print()
+            menue = "0"
+            
+        default:
+            print()
+            print("Eingabe nicht verfügbar, du wirst zum Hauptmenü weitergeleitet")
+            sleep(2)
+            menue = "0"
+            
+        }
     }
-}
+    */

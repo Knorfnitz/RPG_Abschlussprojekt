@@ -37,7 +37,7 @@ class Mage: Hero, CanUseSpecialAttack, CanHaveCritDamage {
         let mpCosts3: Int = 25
         let mpCosts4: Int = 50
         
-        print("Sepzialattacken:\n")
+        print("Spezialattacken:\n")
         print("1. \(attackName1) MP: \(mpCosts1)   Kraft: \(damageAttack1)")
         if lvl >= 5 {
             print("2. \(attackName2) MP: \(mpCosts2)   Kraft: \(damageAttack2)")

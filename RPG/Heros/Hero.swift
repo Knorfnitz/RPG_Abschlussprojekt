@@ -95,4 +95,26 @@ class Hero{
        """)
     }
     
+    func printDetailsforTerminal() {
+        
+        let heroStats: [String] = ["HP:       \(fullHp)",
+                                   "MP:       \(fullMp)",
+                                   "Stärke:   \(str)",
+                                   "Vert.:    \(def)",
+                                   "Int:      \(int)",
+                                   "\(voidString)",
+                                   "\(voidString)",
+                                   "\(name) wurde gewählt!",
+                                   "\(voidString)",
+                                   "Ist das richtig?",
+                                   "\(voidString)",
+                                   "Weiter mit Enter...)",
+                                   "Oder Abbrechen mit beliebiger Eingabe"
+                                    ]
+        
+        generateTerminalWindowWithSouls(topic: name, printArray: heroStats, in: terminalWidth)
+
+    }
 }
+
+
