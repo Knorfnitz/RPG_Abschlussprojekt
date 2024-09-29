@@ -27,7 +27,7 @@ func showLvlForTerminal(_ fightingHeros: [Hero]){
     showLvlForTerminalStringArray.append(voidString)
     showLvlForTerminalStringArray.append(voidString)
     for (i, hero) in fightingHeros.enumerated(){
-        showLvlForTerminalStringArray.append("[\(i)] \(hero.name) Lvl: \(hero.lvl)  HP: \(hero.hp)/\(hero.fullHp)  MP: \(hero.mp)/\(hero.fullMp)")
+        showLvlForTerminalStringArray.append("[\(i+1)] \(hero.name) Lvl: \(hero.lvl)  HP: \(hero.hp)/\(hero.fullHp)  MP: \(hero.mp)/\(hero.fullMp)")
         showLvlForTerminalStringArray.append(voidString)
     }
     
@@ -128,41 +128,99 @@ func startLevelForTerminal(){
     showLvlForTerminal(fightingHeros)
     
     let selectedLevel:Int = selectLevel()
-    
     let enemyTeam = generateEnemies(selectedLevel)
     _ = lvlupEnemies(enemyTeam, selectedLevel)
+    
+    let battleTopic: String = "Kampf auf Ebene \(selectedLevel)"
+    
+    var enemiesNames: [String] = []
+    var heroNames: [String] = []
+    
+    for (i, enemy) in enemyTeam.enumerated(){
+        var enemyEmoji: String = ""
+        switch enemy.rare{
+        case ..<2:
+            enemyEmoji = "[\(i+1)] 👻"
+        case 2..<3:
+            enemyEmoji = "[\(i+1)] 👿"
+        case 3..<4:
+            enemyEmoji = "[\(i+1)] 👺"
+        case 4..<10:
+            enemyEmoji = "[\(i+1)] 💀"
+        case 10:
+            enemyEmoji = "[\(i+1)] 😼"
+        default :
+        enemyEmoji = "[\(i+1)] ❓"
+            
+        }
+        enemiesNames.append("\(enemyEmoji) \(enemy.name)")
+    }
+    
+    for (i, hero) in fightingHeros.enumerated(){
+        heroNames.append("[\(i+1)] \(hero.name)  HP: \(hero.hp)/\(hero.fullHp)  MP: \(hero.mp)/\(hero.fullMp)")
+    }
+    
     var fight: Bool = true
     while fight{
+        
+        
         for hero in fightingHeros{
+            
             if hero.hp > 0{
-                showEnemiesAndWaitForHeroAction(hero: hero, enemies: enemyTeam)
                 if areAllEnemiesDead(enemyTeam){
-                    print("Du hast alle Gegner besiegt!")
+                    //Gewonnen
+                    let winTopic: String = "Sieg"
+                    var winStringArray: [String] = []
+                    let getLootList: [String] = generateLootForTerminal(enemies: enemyTeam, lvl: selectedLevel)
                     let lootSouls:Int = generateLootsouls(enemies: enemyTeam)
-                    print("Du hast \(lootSouls) Seelen erhalten")
-                    printLine()
-                    addSouls(lootSouls)
-                    generateLoot(enemies: enemyTeam)
-                    print("Weiter mit Enter")
-                    _ = readLine()
+                    
+                    winStringArray.append("Du hast alle Gegner besiegt und dafür \(lootSouls) Seelen erhalten!")
+                    winStringArray.append(voidString)
+                    winStringArray.append(contentsOf: getLootList)
+                    winStringArray.append(voidString)
+                    
                     if selectedLevel == maxLvl{
                         icreaseMaxLevel()
-                        print("Du kannst nun Ebene \(maxLvl) betreten\n")
-                        print("Weiter mit Enter")
-                        _ = readLine()
+                        winStringArray.append("Du kannst nun Ebene \(maxLvl) betreten")
+                        winStringArray.append(voidString)
                     }
+                    winStringArray.append(enterString)
+                    
+                    generateTerminalWindowWithSoulAndCenterd(topic: winTopic, printArray: winStringArray, in: terminalWidth)
+                    _ = readLine()
+                    
                     fight = false
                     
+                }else{
+                    //Held aktion
+                    showEnemiesAndWaitForHeroActionForTerminal(hero: hero, herosNames: heroNames, enemies: enemyTeam, enemyNames: enemiesNames, topic: battleTopic)
                 }
+                
+            }else{
+                if areAllHerosDead(heroTeam){
+                    let looseTopic: String = "Verloren"
+                    restartLevel(heros: heroTeam)
+                    let looseStringArray: [String] = [
+                        voidString,
+                        voidString,
+                        "Alle Helden sind kampfunfähig",
+                        voidString,
+                        "Ihr habt alle Seelen verloren",
+                        voidString,
+                        "Ihr wacht im Lager auf...",
+                        voidString,
+                        enterString,
+                    ]
+                    generateTerminalWindowWithSoulAndCenterd(topic: looseTopic, printArray: looseStringArray, in: terminalWidth)
+                    _ = readLine()
+                    
+                    fight = false
             }
         }
         if fight {
             enemiesAction(enemies: enemyTeam, heros: heroTeam)
             
-            if areAllHerosDead(heroTeam){
-                print("Du hast verloren")
-                restartLevel(heros: heroTeam)
-                fight = false
+           
             }
         }
     }
@@ -272,27 +330,25 @@ func showEnemiesAndWaitForHeroAction(hero: Hero, enemies: [Enemy]){
 }
 
 
-func showEnemiesAndWaitForHeroActionForTerminal(hero: Hero, enemies: [Enemy]){
-    let terminalSize // generate fightWindow
-    printLine()
-    print("Gegner:")
-    for (i, enemy) in enemies.enumerated(){
-        print("\(i+1): \(enemy.name) (Level: \(enemy.lvl))")
-    }
-    if !areAllEnemiesDead(enemies){
-        printRows(rows: 3)
-        print("Was soll \(hero.name) tun?")
-        print("1. Standardangriff")
-        print("2. Spezialangriff")
-        print("3. Beutel")
-        printRows(rows: 1)
-        printLine()
-        
+func showEnemiesAndWaitForHeroActionForTerminal(hero: Hero, herosNames: [String], enemies: [Enemy], enemyNames: [String], topic: String){
+    var newEnemyNames: [String] = enemyNames
+    var aktiveHeroStringArray: [String] = herosNames
+    var battleMassages: [String] = []
         var isHeroNotFinish:Bool = false
+        var critRate: Double = 1.0
+    for i in 0..<aktiveHeroStringArray.count{
+        if aktiveHeroStringArray[i].contains(hero.name){
+            aktiveHeroStringArray[i] = ">> " + aktiveHeroStringArray[i]
+        }else{
+            aktiveHeroStringArray[i] = "   " + aktiveHeroStringArray[i]
+        }
+    }
+    battleMassages.append("Was soll \(hero.name) machen?")
+    
+    
+    battleScreen(topic: topic,actionMessage: battleMassages, enemies: enemyNames, heros: aktiveHeroStringArray, in: terminalWidth)
         
         let heroAction = readNumber()
-        
-        var critRate: Double = 1.0
         
         if hero is CanHaveCritDamage{
             let canHaveCritDamage = hero as! CanHaveCritDamage
@@ -301,20 +357,35 @@ func showEnemiesAndWaitForHeroActionForTerminal(hero: Hero, enemies: [Enemy]){
         
         switch heroAction{
         case 1:
+            battleMassages = []
+            battleMassages.append("Welcher Gegner soll \(hero.name) angreifen?")
             
-            let target = chooseEnemy(enemies: enemies)
-            hero.basicAttack(target, critRate)
+            battleScreen(topic: topic,actionMessage: battleMassages, enemies: enemyNames, heros: aktiveHeroStringArray, in: terminalWidth)
+            
+            let target = chooseEnemyForTerminal(enemies: enemies)
+            
+            battleMassages = []
+            battleMassages.append(contentsOf: hero.basicAttackForTerminal(target, critRate))
+            
+            newEnemyNames = checkEnemieStatus(enemies: enemies, enemieNames: enemyNames) //enemyNames?
+            
+            battleScreen(topic: topic,actionMessage: battleMassages, enemies: newEnemyNames, heros: aktiveHeroStringArray, in: terminalWidth)
+            sleep(2)
             
             break
         case 2:
             if !(hero is CanUseSpecialAttack){
+                battleMassages = []
+                battleMassages.append("\(hero.name) kann noch keine Spezialattacke")
                 print("\(hero.name) kann noch keine Spezialattacke")
-                showEnemiesAndWaitForHeroAction(hero: hero, enemies: enemies)
+                battleScreen(topic: topic,actionMessage: battleMassages, enemies: newEnemyNames, heros: aktiveHeroStringArray, in: terminalWidth)
+                sleep(2)
+                showEnemiesAndWaitForHeroActionForTerminal(hero: hero, herosNames: herosNames, enemies: enemies, enemyNames: newEnemyNames, topic: topic)
             }else{
                 let canUseSpecialAttack = hero as! CanUseSpecialAttack
-                let done:Bool = canUseSpecialAttack.useSpecialAttack(enemy: chooseEnemy(enemies: enemies), critRate: critRate)
+                let done:Bool = canUseSpecialAttack.useSpecialAttackForTerminal(enemy: chooseEnemy(enemies: enemies), critRate: critRate)
                 if !done{
-                    showEnemiesAndWaitForHeroAction(hero: hero, enemies: enemies)
+                    showEnemiesAndWaitForHeroActionForTerminal(hero: hero, herosNames: herosNames, enemies: enemies, enemyNames: enemyNames, topic: topic)
                 }
             }
             break
@@ -328,7 +399,7 @@ func showEnemiesAndWaitForHeroActionForTerminal(hero: Hero, enemies: [Enemy]){
             showEnemiesAndWaitForHeroAction(hero: hero, enemies: enemies)
         }
     }
-}
+
 
 
 func chooseEnemy (enemies: [Enemy]) -> Enemy{
@@ -343,6 +414,19 @@ func chooseEnemy (enemies: [Enemy]) -> Enemy{
         }
     }else{
         return enemies[0]
+    }
+}
+
+func chooseEnemyForTerminal (enemies: [Enemy]) -> Enemy{
+    if enemies.count(where: {$0.hp > 0}) > 1{
+        let input: Int = readNumber()
+        if input <= enemies.count{
+            return enemies[input - 1]
+        }else{
+            return chooseEnemyForTerminal(enemies: enemies)
+        }
+    }else{
+        return chooseEnemyForTerminal(enemies: enemies)
     }
 }
 
@@ -467,6 +551,7 @@ func generateLootsouls(enemies: [Enemy]) -> Int{
 }
 
 func generateLoot(enemies: [Enemy]) {
+    
     
     for enemy in enemies{
         
@@ -713,4 +798,196 @@ func printFightingTeam(){
             
         }
     }
+
+
+func generateLootForTerminal(enemies: [Enemy], lvl: Int) -> [String] {
+    var loot: [String] = []
+    
+    for enemy in enemies{
+        
+        switch lvl{
+        case 1...5:
+            //Für Level 1-5 die drops bestimmen, erst Potions, dann Rüstung, dann Waffen
+            var dropRate:Double = calculateDropChance(enemy: enemy)
+            if dropRate * 2 >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 0 : 4
+                loot.append("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichWeapon: Int = Int.random(in: 0...9)
+                loot.append("\(enemy.name) hat \(inventory.weapons[whichWeapon].name) gedroppt!")
+                inventory.weapons[whichWeapon].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                loot.append("\(enemy.name) hat \(inventory.armors[0].name) gedroppt!")
+                inventory.armors[0].amount += 1
+            }
+            
+        case 6...10:
+            var dropRate:Double = calculateDropChance(enemy: enemy)
+            if dropRate * 2 >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 0 : 4
+                loot.append("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichWeapon: Int = Int.random(in: 10...19)
+                loot.append("\(enemy.name) hat \(inventory.weapons[whichWeapon].name) gedroppt!")
+                inventory.weapons[whichWeapon].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                loot.append("\(enemy.name) hat \(inventory.armors[1].name) gedroppt!")
+                inventory.armors[1].amount += 1
+            }
+        case 11...15:
+            var dropRate:Double = calculateDropChance(enemy: enemy)
+            if dropRate * 2 >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 0 : 4
+                loot.append("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 1 : 5
+                loot.append("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichWeapon: Int = Int.random(in: 10...19)
+                loot.append("\(enemy.name) hat \(inventory.weapons[whichWeapon].name) gedroppt!")
+                inventory.weapons[whichWeapon].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                loot.append("\(enemy.name) hat \(inventory.armors[2].name) gedroppt!")
+                inventory.armors[2].amount += 1
+            }
+        case 16...20:
+            var dropRate:Double = calculateDropChance(enemy: enemy)
+            if dropRate * 2 >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 0 : 4
+                loot.append("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 1 : 5
+                loot.append("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichWeapon: Int = Int.random(in: 10...19)
+                loot.append("\(enemy.name) hat \(inventory.weapons[whichWeapon].name) gedroppt!")
+                inventory.weapons[whichWeapon].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                loot.append("\(enemy.name) hat \(inventory.armors[3].name) gedroppt!")
+                inventory.armors[3].amount += 1
+            }
+        case 21...25:
+            var dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 1 : 5
+                loot.append("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichWeapon: Int = Int.random(in: 10...19)
+                loot.append("\(enemy.name) hat \(inventory.weapons[whichWeapon].name) gedroppt!")
+                inventory.weapons[whichWeapon].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                loot.append("\(enemy.name) hat \(inventory.armors[4].name) gedroppt!")
+                inventory.armors[4].amount += 1
+            }
+        case 26...30:
+
+            var dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 1 : 5
+                loot.append("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 2 : 6
+                loot.append("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichWeapon: Int = Int.random(in: 10...19)
+                loot.append("\(enemy.name) hat \(inventory.weapons[whichWeapon].name) gedroppt!")
+                inventory.weapons[whichWeapon].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                loot.append("\(enemy.name) hat \(inventory.armors[5].name) gedroppt!")
+                inventory.armors[5].amount += 1
+            }
+        case 31...999:
+            var dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 2 : 6
+                loot.append("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate * 0.5 >= Double.random(in: 0...1){
+                let whichPotion: Int = Bool.random() ? 3 : 7
+                loot.append("\(enemy.name) hat \(inventory.potions[whichPotion].name) gedroppt!")
+                inventory.potions[whichPotion].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                let whichWeapon: Int = Int.random(in: 10...19)
+                loot.append("\(enemy.name) hat \(inventory.weapons[whichWeapon].name) gedroppt!")
+                inventory.weapons[whichWeapon].amount += 1
+            }
+            dropRate = calculateDropChance(enemy: enemy)
+            if dropRate >= Double.random(in: 0...1){
+                loot.append("\(enemy.name) hat \(inventory.armors[5].name) gedroppt!")
+                inventory.armors[5].amount += 1
+            }
+        default:
+            print()
+        }
+        
+    }
+    while loot.count >= 12{
+        loot.remove(at: 0)
+    }
+    
+    return loot
+}
+
+
+func checkEnemieStatus(enemies: [Enemy], enemieNames: [String]) -> [String] {
+    var newEnemieNamesString: [String] = enemieNames
+    for i in 0..<enemieNames.count{
+        if enemieNames[i].contains(enemies[i].name){
+            if enemies[i].hp < enemies[i].fullHp/2 && !enemieNames[i].contains("(geschwächt)") {
+                newEnemieNamesString[i] = newEnemieNamesString[i] + "(geschwächt)"
+            }
+            if enemies[i].hp < (enemies[i].fullHp / 5) && !enemieNames[i].contains("(taumelt)") {
+                newEnemieNamesString[i] = newEnemieNamesString[i] + "(taumelt)"
+            }
+            if enemies[i].hp <= 0 && !enemieNames[i].contains("XXX") {
+                newEnemieNamesString[i] = "XXX" + newEnemieNamesString[i] + "XXX"
+            }
+        }
+    }
+    return newEnemieNamesString
+}
 

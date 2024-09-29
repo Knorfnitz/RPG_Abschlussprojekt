@@ -108,11 +108,12 @@ func waitForInput(){
 }
 
 func createCheatTeam (){
+    heroTeam.append(radagast)
     heroTeam.append(kirito)
     heroTeam.append(rias)
-    heroTeam.append(shion)
     
-    availableHerosForBuy.append(radagast)
+    
+    availableHerosForBuy.append(shion)
     availableHerosForBuy.append(aragorn)
     availableHerosForBuy.append(milim)
     
@@ -136,18 +137,18 @@ func createCheatTeam (){
     rias.mp = rias.fullMp
     
     
-    shion.str += 2500
-    shion.def += 500
-    shion.int += 500
-    shion.dex += 1500
-    shion.fullHp = shion.str * 3 + shion.def * 9
-    shion.hp = shion.fullHp
-    shion.fullMp = Int(Double(shion.dex) * 0.5 + Double(shion.int) * 2.5)
-    shion.mp = shion.fullMp
+    radagast.str += 2500
+    radagast.def += 500
+    radagast.int += 500
+    radagast.dex += 1500
+    radagast.fullHp = radagast.str * 3 + radagast.def * 9
+    radagast.hp = radagast.fullHp
+    radagast.fullMp = Int(Double(radagast.dex) * 0.5 + Double(radagast.int) * 2.5)
+    radagast.mp = radagast.fullMp
     
     kirito.lvl = 99
     rias.lvl = 99
-    shion.lvl = 99
+    radagast.lvl = 99
     
     maxLvl = 99
     

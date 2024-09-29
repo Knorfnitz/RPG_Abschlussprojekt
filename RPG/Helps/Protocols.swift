@@ -1,7 +1,11 @@
 protocol CanUseSpecialAttack {
     
-    func useSpecialAttack(enemy: Enemy, critRate: Double) -> Bool
+func useSpecialAttack(enemy: Enemy, critRate: Double) -> Bool
         
+
+
+func useSpecialAttackForTerminal(enemy: Enemy, critRate: Double) -> Bool
+    
 }
 
 

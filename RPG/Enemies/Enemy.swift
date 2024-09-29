@@ -7,18 +7,23 @@ class Enemy{
         didSet{
 
             if hp <= fullHp/2 && oldValue > fullHp / 2 {
-                print("\(name) ist geschwächt")
+                //print("\(name) ist geschwächt")
+                let oldName = name
+                name = "\(oldName) (geschwächt)"
             
             }
             if hp <= Int((Double(fullHp) * 0.2)) && oldValue > Int((Double(fullHp) * 0.2)) {
-                print("\(name) taumelt!")
-                
+                //print("\(name) taumelt!")
+                let oldName = name
+                name = "\(oldName) (taumbelt)"
+                name = name.replacingOccurrences(of: "(geschwächt)", with: "")
             }
             if hp <= 0 && oldValue > 0{
                 print("\(name) wurde besiegt")
                 hp = 0
                 let oldName = name
-                name = "XXX \(oldName) wurde besieht XXX"
+                name = name.replacingOccurrences(of: "(taumbelt)", with: "")
+                name = "XXX \(oldName) XXX"
             }
         }
     }

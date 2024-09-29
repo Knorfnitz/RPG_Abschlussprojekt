@@ -3,10 +3,11 @@ class Hero{
     let allowedWeaponTypes: [WeaponType]
     var armor: Armor?
     
-    let name: String
+    var name: String
     var fullHp: Int
     var hp: Int{
         didSet {
+            //let oldname: String = name
             if hp <= fullHp/2 && oldValue > fullHp / 2 {
                 print("\(name) ist geschwächt")
                 
@@ -17,10 +18,13 @@ class Hero{
             }
             if hp <= 0 && oldValue > 0{
                 print("\(name) wurde besiegt")
+                name = strikethrough + name + reset
                 hp = 0
             }
             if hp > fullHp {
                 hp = fullHp
+            }
+            if hp > 0 {
             }
         }
     }
@@ -71,6 +75,25 @@ class Hero{
         }
         enemy.hp -= damage
     
+    }
+    
+    func basicAttackForTerminal(_ enemy: Enemy, _ critRate: Double) -> [String]{
+        var basicAttackMessages: [String] = []
+        var damage = Int(Double(self.str - enemy.defense) * critRate)
+        
+        if damage <= 0 {
+            damage = 0
+            basicAttackMessages.append("\(enemy.name) ist zu stark und nimmt keinen Schaden!")
+        }else{
+            basicAttackMessages.append("\(self.name) greift \(enemy.name)")
+            basicAttackMessages.append("mit einem Basisangriff für \(damage) Schaden an.")
+            if critRate > 1 {
+                basicAttackMessages.append(voidString)
+                basicAttackMessages.append("Der Angriff war kritisch!")
+            }
+        }
+        enemy.hp -= damage
+        return basicAttackMessages
     }
     
 

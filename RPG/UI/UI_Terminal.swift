@@ -958,7 +958,6 @@ func campMenu(terminal: Int){
                 levelUpForTerminal(hero: chooseHeroForLevelUpForTerminal(heros: heroTeam))
                 menue = "0"
             case "5":
-                startLevel()
                 startLevelForTerminal()
                 menue = "0"
             case "6":
@@ -971,4 +970,121 @@ func campMenu(terminal: Int){
             }
         }
     }
+}
+
+
+func battleScreen(topic: String,actionMessage: [String], enemies: [String], heros: [String], in width: Int) {
+    clearScreen()
+    var rowCount: Int = 0
+   // let screenCenter: Int = width / 2
+    
+    rowCount += printTerminalLine()
+    // Überschrift 2 Zeilen
+    if !topic.isEmpty{
+        print("\(bold)\(centerString(topic, in: width))\(reset)\(maincolor)")
+        rowCount += 1
+       //rowCount += printTerminalEmptyLine()
+    }
+    //Mitte Rechts bis zu 3 Gegner
+    let enemiesArray: [String] = leftStringArrayStartCenter(enemies, in: width)
+
+    for line in enemiesArray{
+        print(line)
+        rowCount += 1
+    }
+
+   switch enemiesArray.count {
+   case 1:
+       rowCount += printTerminalEmptyLine()
+       rowCount += printTerminalEmptyLine()
+   case 2:
+       rowCount += printTerminalEmptyLine()
+   case 3:
+       rowCount += 0
+   default:
+       print("Kann nicht sein")
+    }
+    rowCount += printTerminalEmptyLine()
+    rowCount += printTerminalEmptyLine()
+    rowCount += printTerminalEmptyLine()
+    
+    for line in actionMessage{
+        print(centerString(line, in: terminalWidth))
+        rowCount += 1
+    }
+    
+    while rowCount < 17{
+        rowCount += printTerminalEmptyLine()
+    }
+    let newArray: [String] = twoRowsStringArrayWithActionMenu(stringsRight: heros, in: terminalWidth)
+        
+    
+    _ = printStringArray(newArray)
+    
+   
+    _ = printTerminalEmptyLine()
+    _ = printTerminalLine()
+}
+
+
+func leftStringArrayStartCenter(_ strings: [String], in width: Int) -> [String] {
+    
+        let paddingLeft = (width / 2) + 15
+        var paddingRight: Int = 0
+        var stringArrayWithPadding: [String] = []
+    
+        for string in strings {
+          
+                paddingRight = width - string.count - paddingLeft
+            
+            stringArrayWithPadding.append("⬛️" + String(repeating: " ", count: paddingLeft) + string + String(repeating: " ", count: paddingRight - 1) + "⬛️") // -1 für emoji count
+        }
+        return stringArrayWithPadding
+        
+    }
+
+func twoRowsStringArrayWithActionMenu(stringsRight: [String], in width: Int) -> [String] {
+    let actionMenu: [String] = [
+        "[1] Attacke",
+        "[2] Spezialattacke",
+        "[3] Beutel"
+        ]
+    var rightStringArray: [String] = []
+    
+    let paddingLeft = 2
+    var paddingMiddle: Int = 0
+    var paddingRight: Int = 0
+    var stringArrayWithPadding: [String] = []
+
+    switch stringsRight.count {
+        case 0:
+            rightStringArray.append(voidString)
+            rightStringArray.append(voidString)
+            rightStringArray.append(voidString)
+        case 1:
+            rightStringArray.append(stringsRight[0])
+            rightStringArray.append(voidString)
+            rightStringArray.append(voidString)
+        case 2:
+            rightStringArray.append(stringsRight[0])
+            rightStringArray.append(stringsRight[1])
+            rightStringArray.append(voidString)
+        case 3:
+            rightStringArray.append(stringsRight[0])
+            rightStringArray.append(stringsRight[1])
+            rightStringArray.append(stringsRight[1])
+        default:
+            print("Kann nicht sein")
+        }
+
+    for (i, string) in actionMenu.enumerated() {
+        //zum Punkt breite/2 + 2 = paddingLeft + string + x
+        paddingMiddle =  ((width/2) - 10) - string.count - paddingLeft
+        //Restpadding x = breite - paddingLeft - stringLeft - paddingMitte - stringRight +1 für emoji count
+        paddingRight = width - paddingLeft - string.count - paddingMiddle - stringsRight[i].count
+        
+        stringArrayWithPadding.append("⬛️" + String(repeating: " ", count: paddingLeft) + string + String(repeating: " ", count: paddingMiddle) + stringsRight[i] + String(repeating: " ", count: paddingRight) + "⬛️")
+    }
+    return stringArrayWithPadding
+    
 }
