@@ -407,7 +407,7 @@ func startScreen(terminal: Int){
 ⬛️                                                                                            ⬛️
 ⬛️                                                                                            ⬛️
 ⬛️                                                                                            ⬛️
-⬛️                                                                Danke Maik K. =)            ⬛️
+⬛️                                                                Danke Mike K. =)            ⬛️
 ⬛️                                                                                            ⬛️
 ⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️⬛️
 """)
@@ -495,6 +495,11 @@ func centerString(_ string: String, in width: Int) -> String {
     
 }
 
+
+
+
+
+
 func centerStringArray(_ strings: [String], in width: Int) -> [String] {
     var maxStringCount: Int = 0
     
@@ -517,6 +522,8 @@ func centerStringArray(_ strings: [String], in width: Int) -> [String] {
         return stringArrayWithPadding
         
     }
+
+
 
 func printStringArray(_ strings: [String] )-> Int{
     let count: Int = strings.count
@@ -589,6 +596,8 @@ func generateTerminalWindowWithSouls(topic: String, printArray: [String], in wid
     _ = printTerminalLine()
     
 }
+
+
 func generateTerminalWindowWithSoulAndCenterd(topic: String, printArray: [String], in width: Int){
     clearScreen()
     var rowCount: Int = 0

@@ -138,9 +138,9 @@ class Druid: Hero, CanUseSpecialAttack, CanHaveCritDamage {
     }
     
     
-    func useSpecialAttackForTerminal(enemy: Enemy, critRate: Double, target: Int) -> Bool {
+    func useSpecialAttackForTerminal(enemy: Enemy, critRate: Double, target: Int) -> (Bool, Bool) {
         
-        let specialTopic = "Spezialattacken von \(name)"
+        let specialTopic = "Spezialattacken von \(name) - MP: \(mp)/\(fullMp)"
         var attackStringArray: [String] = []
         
         let attackName1:String = "Sternenschauer"
@@ -164,6 +164,7 @@ class Druid: Hero, CanUseSpecialAttack, CanHaveCritDamage {
         let mpCosts4: Int = 50
         
         
+       
         attackStringArray.append("[1] \(attackName1) MP: \(mpCosts1)   Kraft: \(damageAttack1)")
         if lvl >= 5 {
             attackStringArray.append("[2] \(attackName2) MP: \(mpCosts2)   Kraft: \(damageAttack2)")
@@ -174,10 +175,12 @@ class Druid: Hero, CanUseSpecialAttack, CanHaveCritDamage {
         if lvl >= 30 {
             attackStringArray.append("[4] \(attackName4) MP: \(mpCosts4)   Kraft: \(damageAttack4)")
         }
+        
         attackStringArray.append(voidString)
         attackStringArray.append("[9] Zurück")
         attackStringArray.append(voidString)
         attackStringArray.append("Welche Attacke möchtest du ausführen?")
+        
         
         generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
         
@@ -196,7 +199,7 @@ class Druid: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 
                 sleep(2)
                 
-                return false
+                return (false, true)
                 
             }else{
                 
@@ -233,7 +236,7 @@ class Druid: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
                 sleep(3)
                 
-                return true
+                return (true, false)
             }
             
         }else if choice == 2 && lvl >= 5{
@@ -248,7 +251,7 @@ class Druid: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 
                 sleep(2)
                 
-                return false
+                return (false, true)
                 
             }else{
                 
@@ -286,7 +289,7 @@ class Druid: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
                 sleep(3)
                 
-                return true
+                return (true, false)
             }
             
         }else if choice == 3 && lvl >= 15{
@@ -299,7 +302,7 @@ class Druid: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
                 sleep(2)
-                return false
+                return (false, true)
                 
             }else{
                 mp -= mpCosts3
@@ -333,7 +336,7 @@ class Druid: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 attackStringArray.append(checkEnemyHealth(enemy: enemy, target: target))
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
                 sleep(3)
-                return true
+                return (true, false)
             }
             
         }else if choice == 4 && lvl >= 30{
@@ -345,7 +348,7 @@ class Druid: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
                 sleep(2)
-                return false
+                return (false, true)
                 
             }else{
                 mp -= mpCosts4
@@ -378,21 +381,21 @@ class Druid: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 attackStringArray.append(checkEnemyHealth(enemy: enemy, target: target))
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
                 sleep(3)
-                return true
+                return (true, false)
             }
         }else if choice == 9{
             
-            return false
+            return (false, false)
         }else{
             print("Falsche Eingabe!")
             sleep(2)
             _ = useSpecialAttackForTerminal(enemy: enemy, critRate: critRate, target: target)
         }
         
-        return true
+        return (true, false)
     }
     
-    
+
     
 }
 let radagast: Druid = Druid(name: "Radagast", str: 5, def: 10, int: 7, dex: 3, allowedWeaponTypes: [.totem, .mace])

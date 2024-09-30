@@ -48,7 +48,7 @@ class Enemy{
     
     init(name: String, rare: Int, monsterIndex: Double) {
         self.name = name
-        self.fullHp = Int(Double(lvl * 10000) * monsterIndex)
+        self.fullHp = Int(Double(lvl * 75) * monsterIndex)
         self.hp = fullHp
         self.damage = Int(Double(lvl * 8) * monsterIndex)
         self.defense = Int(Double(lvl * 2) * monsterIndex)
@@ -63,7 +63,7 @@ class Enemy{
       
     func increaseLvl(_ addlvl: Int){
         lvl += addlvl-1
-        fullHp = Int(Double(addlvl * 10000) * monsterIndex)
+        fullHp = Int(Double(addlvl * 75) * monsterIndex)
         hp = fullHp
         damage = Int(Double(addlvl * 15) * monsterIndex)
         defense = Int(Double(addlvl * 20) * monsterIndex)

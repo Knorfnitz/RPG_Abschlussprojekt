@@ -138,8 +138,8 @@ class Mage: Hero, CanUseSpecialAttack, CanHaveCritDamage {
         return true
     }
     
-    func useSpecialAttackForTerminal(enemy: Enemy, critRate: Double, target: Int) -> Bool {
-        let specialTopic = "Spezialattacken von \(name)"
+    func useSpecialAttackForTerminal(enemy: Enemy, critRate: Double, target: Int) -> (Bool, Bool) {
+        let specialTopic = "Spezialattacken von \(name) - MP: \(mp)/\(fullMp)"
         var attackStringArray: [String] = []
         
         let attackName1:String = "Eis Speer"
@@ -194,7 +194,7 @@ class Mage: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 
                 sleep(2)
                 
-                return false
+                return (false, true)
                 
             }else{
                 
@@ -231,7 +231,7 @@ class Mage: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
                 sleep(3)
                 
-                return true
+                return (true, false)
             }
             
         }else if choice == 2 && lvl >= 5{
@@ -246,7 +246,7 @@ class Mage: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 
                 sleep(2)
                 
-                return false
+                return (false, true)
                 
             }else{
                 
@@ -284,7 +284,7 @@ class Mage: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
                 sleep(3)
                 
-                return true
+                return (true, false)
             }
             
         }else if choice == 3 && lvl >= 15{
@@ -297,7 +297,7 @@ class Mage: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
                 sleep(2)
-                return false
+                return (false, true)
                 
             }else{
                 mp -= mpCosts3
@@ -331,7 +331,7 @@ class Mage: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 attackStringArray.append(checkEnemyHealth(enemy: enemy, target: target))
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
                 sleep(3)
-                return true
+                return (true, false)
             }
             
         }else if choice == 4 && lvl >= 30{
@@ -343,7 +343,7 @@ class Mage: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
                 sleep(2)
-                return false
+                return (false, true)
                 
             }else{
                 mp -= mpCosts4
@@ -376,18 +376,18 @@ class Mage: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 attackStringArray.append(checkEnemyHealth(enemy: enemy, target: target))
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
                 sleep(3)
-                return true
+                return (true, false)
             }
         }else if choice == 9{
             
-            return false
+            return (false, false)
         }else{
             print("Falsche Eingabe!")
             sleep(2)
             _ = useSpecialAttackForTerminal(enemy: enemy, critRate: critRate, target: target)
         }
         
-        return true
+        return (true, false)
     }
     
 }

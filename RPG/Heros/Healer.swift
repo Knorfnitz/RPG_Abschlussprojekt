@@ -15,6 +15,14 @@ class Healer: Hero, CanUseSpecialAttack, CanHaveCritDamage {
         
     }
     
+    func calculateCritDamage() -> Double {
+        let critChance:Int = Int.random(in: 0...10)
+        if critChance <= 1 {
+            return 1.5
+        }
+        return 1
+    }
+    
     func useSpecialAttack(enemy: Enemy, critRate: Double) -> Bool {
         
         
@@ -128,9 +136,9 @@ class Healer: Hero, CanUseSpecialAttack, CanHaveCritDamage {
         return true
     }
     
-    func useSpecialAttackForTerminal(enemy: Enemy, critRate: Double, target: Int) -> Bool {
+    func useSpecialAttackForTerminal(enemy: Enemy, critRate: Double, target: Int) -> (Bool, Bool) {
         
-        let specialTopic = "Spezialattacken von \(name)"
+        let specialTopic = "Spezialattacken von \(name) - MP: \(mp)/\(fullMp)"
         var attackStringArray: [String] = []
         
         let attackName1:String = "Heiliger Strahl"
@@ -152,6 +160,16 @@ class Healer: Hero, CanUseSpecialAttack, CanHaveCritDamage {
         let mpCosts3: Int = 25
         let mpCosts4: Int = 50
         
+        attackStringArray.append("[1] \(attackName1) MP: \(mpCosts1)   Kraft: \(damageAttack1)")
+        if lvl >= 5 {
+            attackStringArray.append("[2] \(attackName2) MP: \(mpCosts2)   Kraft: \(damageAttack2)")
+        }
+        if lvl >= 15 {
+            attackStringArray.append("[3] \(attackName3) MP: \(mpCosts3)   Kraft: \(damageAttack3)")
+        }
+        if lvl >= 30 {
+            attackStringArray.append("[4] \(attackName4) MP: \(mpCosts4)   Kraft: \(damageAttack4)")
+        }
         attackStringArray.append("[1] \(attackName1) MP: \(mpCosts1)   Kraft: \(damageAttack1)")
         if lvl >= 5 {
             attackStringArray.append("[2] \(attackName2) MP: \(mpCosts2)   Kraft: \(damageAttack2)")
@@ -184,7 +202,7 @@ class Healer: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 
                 sleep(2)
                 
-                return false
+                return (false, true)
                 
             }else{
                 
@@ -221,7 +239,7 @@ class Healer: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
                 sleep(3)
                 
-                return true
+                return (true, false)
             }
             
         }else if choice == 2 && lvl >= 5{
@@ -236,7 +254,7 @@ class Healer: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 
                 sleep(2)
                 
-                return false
+                return (false, true)
                 
             }else{
                 
@@ -274,7 +292,7 @@ class Healer: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
                 sleep(3)
                 
-                return true
+                return (true, false)
             }
             
         }else if choice == 3 && lvl >= 15{
@@ -287,7 +305,7 @@ class Healer: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
                 sleep(2)
-                return false
+                return (false, true)
                 
             }else{
                 mp -= mpCosts3
@@ -321,7 +339,7 @@ class Healer: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 attackStringArray.append(checkEnemyHealth(enemy: enemy, target: target))
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
                 sleep(3)
-                return true
+                return (true, false)
             }
             
         }else if choice == 4 && lvl >= 30{
@@ -333,7 +351,7 @@ class Healer: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
                 sleep(2)
-                return false
+                return (false, true)
                 
             }else{
                 mp -= mpCosts4
@@ -366,26 +384,18 @@ class Healer: Hero, CanUseSpecialAttack, CanHaveCritDamage {
                 attackStringArray.append(checkEnemyHealth(enemy: enemy, target: target))
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
                 sleep(3)
-                return true
+                return (true, false)
             }
         }else if choice == 9{
             
-            return false
+            return (false, false)
         }else{
             print("Falsche Eingabe!")
             sleep(2)
             _ = useSpecialAttackForTerminal(enemy: enemy, critRate: critRate, target: target)
         }
         
-        return true
-    }
-    
-    func calculateCritDamage() -> Double {
-        let critChance:Int = Int.random(in: 0...10)
-        if critChance <= 1 {
-            return 1.5
-        }
-        return 1
+        return (true, false)
     }
     
 }

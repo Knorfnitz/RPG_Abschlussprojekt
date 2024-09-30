@@ -48,7 +48,7 @@ class Hero{
         self.name = name
         self.fullHp = str * 3 + def * 9
         self.hp = fullHp
-        self.fullMp = Int(Double(dex) * 0.5 + Double(int) * 2.5)
+        self.fullMp = Int(Double(dex) * 1 + Double(int) * 2.5)
         self.mp = fullMp
         self.str = str
         self.def = def

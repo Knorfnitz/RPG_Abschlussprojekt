@@ -50,6 +50,8 @@ func startLevelForTerminal(){
     
     let selectedLevel:Int = selectLevel()
     
+    openGate()
+    
     enemyTeam = generateEnemies(selectedLevel)
     generateEnemiesForPrint()
     
@@ -122,6 +124,8 @@ func startLevelForTerminal(){
                     }else{
                         //Held aktion
                         showEnemiesAndWaitForHeroActionForTerminal(hero: hero, topic: battleTopic)
+                        
+                        
                     }
                     
                 }else{
@@ -433,6 +437,7 @@ func showEnemiesAndWaitForHeroActionForTerminal(hero: Hero, topic: String){
                 sleep(2)
                 
                 isHeroNotFinish = true
+                
             }else{
                 
                 if message != ""{
@@ -464,10 +469,9 @@ func showEnemiesAndWaitForHeroActionForTerminal(hero: Hero, topic: String){
                 sleep(2)
                 //newEnemyNames = checkEnemieStatus(enemies: enemies, enemieNames: enemyNames)
                 showEnemiesAndWaitForHeroActionForTerminal(hero: hero, topic: topic)
-            }
-            
-            
-            else{
+                isHeroNotFinish = false
+                
+            }else{
                 let canUseSpecialAttack = hero as! CanUseSpecialAttack
                 battleMassages = []
                 battleMassages.append("Welchen Gegner soll \(hero.name) angreifen?")
@@ -485,7 +489,6 @@ func showEnemiesAndWaitForHeroActionForTerminal(hero: Hero, topic: String){
                     sleep(2)
                     
                     break
-                    
                 }else{
                     
                     if message != ""{
@@ -497,8 +500,9 @@ func showEnemiesAndWaitForHeroActionForTerminal(hero: Hero, topic: String){
                         heroAction = 2
                     }else{
                         
-                        let done:Bool = canUseSpecialAttack.useSpecialAttackForTerminal(enemy: target, critRate: critRate, target: targetIndex)
-                        if !done{
+                        let (done, notEnoughMp) = canUseSpecialAttack.useSpecialAttackForTerminal(enemy: target, critRate: critRate, target: targetIndex)
+                        
+                        if !done || notEnoughMp{
                             // newEnemyNames = checkEnemieStatus(enemies: enemies, enemieNames: enemyNames)
                             showEnemiesAndWaitForHeroActionForTerminal(hero: hero, topic: topic)
                             isHeroNotFinish = true
@@ -519,14 +523,7 @@ func showEnemiesAndWaitForHeroActionForTerminal(hero: Hero, topic: String){
                   battleScreen(topic: topic,actionMessage: battleMassages, enemies: enemyTeamForPrint, heros: fightingHerosForPrint, in: terminalWidth)
                   
                   heroAction = readNumber()
-                
             }
-            
-            
-
-            
-            
-            
         default:
 
             showEnemiesAndWaitForHeroActionForTerminal(hero: hero, topic: topic)
@@ -604,7 +601,12 @@ func attackHero(enemy: Enemy, hero: Hero){
     }
 
 func attackHeroForTerminal(enemy: Enemy, hero: Hero){
-    let attackarray: [String] = ["\(enemy.name) greift \(hero.name) mit \(enemy.damage) an"]
+    let attackarray: [String] = [
+        voidString,
+        voidString,
+        voidString,
+        "\(enemy.name) greift \(hero.name) mit \(enemy.damage) an"
+    ]
     generateTerminalWindow(topic: "\(enemy.name) greift an", printArray: attackarray, in: terminalWidth)
 
   sleep(3)
@@ -689,11 +691,11 @@ func lvlupEnemies(_ enemyTeam: [Enemy], _ selectedLevel: Int) -> [Enemy] {
     
     var leveledEnemyTeam: [Enemy] = []
     for enemy in enemyTeam{
-        enemy.fullHp = Int(Double(selectedLevel * 75 * enemy.rare) * enemy.monsterIndex)
+        enemy.fullHp = Int(Double(selectedLevel * 75) * enemy.monsterIndex)
         enemy.hp = enemy.fullHp
-        enemy.damage = Int(Double(selectedLevel * 8 * enemy.rare) * enemy.monsterIndex)
-        enemy.defense = Int(Double(selectedLevel * 1 * enemy.rare) * enemy.monsterIndex)
-        enemy.souls = Int(Double(selectedLevel * 70 * enemy.rare) * enemy.monsterIndex)
+        enemy.damage = Int(Double(selectedLevel * 10 ) * enemy.monsterIndex)
+        enemy.defense = Int(Double(selectedLevel * 3 ) * enemy.monsterIndex)
+        enemy.souls = Int(Double(selectedLevel * 75) * enemy.monsterIndex)
         enemy.lvl = selectedLevel
         
         leveledEnemyTeam.append(enemy)

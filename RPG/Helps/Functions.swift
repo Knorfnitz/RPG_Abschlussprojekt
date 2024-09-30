@@ -208,9 +208,12 @@ func chooseHeroForLevelUpForTerminal(heros: [Hero])-> Hero{
     for (i, hero) in heros.enumerated(){
         array.append("[\(i+1)] \(hero.name) Lvl: \(hero.lvl)")
     }
+    
+    
+    
     generateTerminalWindowWithSouls(topic: topic, printArray: array, in: terminalWidth)
     let choice: Int = readNumber()
-    if choice >= 1 || choice <= heros.count{
+    if choice >= 1 && choice <= heros.count{
         let hero = heros[choice - 1]
             return hero
         }
