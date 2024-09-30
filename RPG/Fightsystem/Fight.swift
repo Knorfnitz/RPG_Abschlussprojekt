@@ -2,7 +2,159 @@ import Foundation
 
 var maxLvl: Int = 1
 
-var fightingHeros: [Hero] = []
+var fightingHeros: [Hero] = Array(heroTeam.prefix(3))
+
+var enemyTeam: [Enemy] = []
+var fightingHerosForPrint: [String] = []
+/*{
+    return fightingHeros.enumerated().map { (index, hero) in
+        return "\(index + 1). \(hero.heroForPrint)"
+    }
+}*/
+var enemyTeamForPrint: [String] = []
+
+func generateNewFightingHerosForPrint(){
+    fightingHerosForPrint = []
+    for (i, hero) in fightingHeros.enumerated(){
+        let newString: String = "[\(i+1)] \(hero.heroForPrint)"
+        fightingHerosForPrint.append(newString)
+    }
+}
+
+func generateEnemiesForPrint(){
+    enemyTeamForPrint = []
+    var enemyEmoji: String = ""
+    for (i, enemy) in enemyTeam.enumerated(){
+        switch enemy.rare{
+         case ..<2:
+         enemyEmoji = "[\(i+1)] 👻"
+         case 2..<3:
+         enemyEmoji = "[\(i+1)] 👿"
+         case 3..<4:
+         enemyEmoji = "[\(i+1)] 👺"
+         case 4..<10:
+         enemyEmoji = "[\(i+1)] 💀"
+         case 10:
+         enemyEmoji = "[\(i+1)] 😼"
+         default :
+         enemyEmoji = "[\(i+1)] ❓"
+         
+         }
+        let newString: String = "\(enemyEmoji) \(enemy.enemyForPrint) "
+        enemyTeamForPrint.append(newString)
+    }
+}
+func startLevelForTerminal(){
+    // fightingHeros = Array(heroTeam.prefix(3))
+    showLvlForTerminal(fightingHeros)
+    
+    let selectedLevel:Int = selectLevel()
+    
+    enemyTeam = generateEnemies(selectedLevel)
+    generateEnemiesForPrint()
+    
+    _ = lvlupEnemies(enemyTeam, selectedLevel)
+    
+    let battleTopic: String = "Kampf auf Ebene \(selectedLevel)"
+    
+    //var enemiesNames: [String] = []
+    //var heroNames: [String] = []
+    
+    //for (i, enemy) in enemyTeam.enumerated(){
+        //var enemyEmoji: String = ""
+        /*switch enemy.rare{
+         case ..<2:
+         enemyEmoji = "[\(i+1)] 👻"
+         case 2..<3:
+         enemyEmoji = "[\(i+1)] 👿"
+         case 3..<4:
+         enemyEmoji = "[\(i+1)] 👺"
+         case 4..<10:
+         enemyEmoji = "[\(i+1)] 💀"
+         case 10:
+         enemyEmoji = "[\(i+1)] 😼"
+         default :
+         enemyEmoji = "[\(i+1)] ❓"
+         
+         }
+         enemiesNames.append("\(enemyEmoji) \(enemy.name)")
+         }*/
+        
+        /* for (i, hero) in fightingHeros.enumerated(){
+         heroNames.append("[\(i+1)] \(hero.name)  HP: \(hero.hp)/\(hero.fullHp)  MP: \(hero.mp)/\(hero.fullMp)")
+         }*/
+        
+        
+        var fight: Bool = true
+        while fight{
+            
+            fightingHeros = Array(heroTeam.prefix(3))
+            
+            for hero in fightingHeros{
+                
+                if hero.hp > 0{
+                    if areAllEnemiesDead(enemyTeam){
+                        //Gewonnen
+                        let winTopic: String = "Sieg"
+                        var winStringArray: [String] = []
+                        let getLootList: [String] = generateLootForTerminal(enemies: enemyTeam, lvl: selectedLevel)
+                        let lootSouls:Int = generateLootsouls(enemies: enemyTeam)
+                        souls += lootSouls
+                        winStringArray.append("Du hast alle Gegner besiegt und dafür \(lootSouls) Seelen erhalten!")
+                        winStringArray.append(voidString)
+                        winStringArray.append(contentsOf: getLootList)
+                        winStringArray.append(voidString)
+                        
+                        if selectedLevel == maxLvl{
+                            icreaseMaxLevel()
+                            winStringArray.append("Du kannst nun Ebene \(maxLvl) betreten")
+                            winStringArray.append(voidString)
+                        }
+                        winStringArray.append(enterString)
+                        
+                        generateTerminalWindowWithSoulAndCenterd(topic: winTopic, printArray: winStringArray, in: terminalWidth)
+                        _ = readLine()
+                        
+                        fight = false
+                        
+                        break
+                        
+                    }else{
+                        //Held aktion
+                        showEnemiesAndWaitForHeroActionForTerminal(hero: hero, topic: battleTopic)
+                    }
+                    
+                }else{
+                    if areAllHerosDead(heroTeam){
+                        let looseTopic: String = "Verloren"
+                        restartLevel(heros: heroTeam)
+                        let looseStringArray: [String] = [
+                            voidString,
+                            voidString,
+                            "Alle Helden sind kampfunfähig",
+                            voidString,
+                            "Ihr habt alle Seelen verloren",
+                            voidString,
+                            "Ihr wacht im Lager auf...",
+                            voidString,
+                            enterString,
+                        ]
+                        generateTerminalWindowWithSoulAndCenterd(topic: looseTopic, printArray: looseStringArray, in: terminalWidth)
+                        _ = readLine()
+                        
+                        fight = false
+                        break
+                    }
+                }
+            }
+            if fight {
+                enemiesActionForTerminal(enemies: enemyTeam, heros: heroTeam)
+                
+                
+            }
+        }
+    }
+
 
 func showLvl(){
     
@@ -123,118 +275,16 @@ func startLevel(){
     }
 }
 
-func startLevelForTerminal(){
-    fightingHeros = Array(heroTeam.prefix(3))
-    showLvlForTerminal(fightingHeros)
-    
-    let selectedLevel:Int = selectLevel()
-    let enemyTeam = generateEnemies(selectedLevel)
-    _ = lvlupEnemies(enemyTeam, selectedLevel)
-    
-    let battleTopic: String = "Kampf auf Ebene \(selectedLevel)"
-    
-    var enemiesNames: [String] = []
-    var heroNames: [String] = []
-    
-    for (i, enemy) in enemyTeam.enumerated(){
-        var enemyEmoji: String = ""
-        switch enemy.rare{
-        case ..<2:
-            enemyEmoji = "[\(i+1)] 👻"
-        case 2..<3:
-            enemyEmoji = "[\(i+1)] 👿"
-        case 3..<4:
-            enemyEmoji = "[\(i+1)] 👺"
-        case 4..<10:
-            enemyEmoji = "[\(i+1)] 💀"
-        case 10:
-            enemyEmoji = "[\(i+1)] 😼"
-        default :
-        enemyEmoji = "[\(i+1)] ❓"
-            
-        }
-        enemiesNames.append("\(enemyEmoji) \(enemy.name)")
-    }
-    
-    for (i, hero) in fightingHeros.enumerated(){
-        heroNames.append("[\(i+1)] \(hero.name)  HP: \(hero.hp)/\(hero.fullHp)  MP: \(hero.mp)/\(hero.fullMp)")
-    }
-    
-    var fight: Bool = true
-    while fight{
-        
-        
-        for hero in fightingHeros{
-            
-            if hero.hp > 0{
-                if areAllEnemiesDead(enemyTeam){
-                    //Gewonnen
-                    let winTopic: String = "Sieg"
-                    var winStringArray: [String] = []
-                    let getLootList: [String] = generateLootForTerminal(enemies: enemyTeam, lvl: selectedLevel)
-                    let lootSouls:Int = generateLootsouls(enemies: enemyTeam)
-                    
-                    winStringArray.append("Du hast alle Gegner besiegt und dafür \(lootSouls) Seelen erhalten!")
-                    winStringArray.append(voidString)
-                    winStringArray.append(contentsOf: getLootList)
-                    winStringArray.append(voidString)
-                    
-                    if selectedLevel == maxLvl{
-                        icreaseMaxLevel()
-                        winStringArray.append("Du kannst nun Ebene \(maxLvl) betreten")
-                        winStringArray.append(voidString)
-                    }
-                    winStringArray.append(enterString)
-                    
-                    generateTerminalWindowWithSoulAndCenterd(topic: winTopic, printArray: winStringArray, in: terminalWidth)
-                    _ = readLine()
-                    
-                    fight = false
-                    
-                }else{
-                    //Held aktion
-                    showEnemiesAndWaitForHeroActionForTerminal(hero: hero, herosNames: heroNames, enemies: enemyTeam, enemyNames: enemiesNames, topic: battleTopic)
-                }
-                
-            }else{
-                if areAllHerosDead(heroTeam){
-                    let looseTopic: String = "Verloren"
-                    restartLevel(heros: heroTeam)
-                    let looseStringArray: [String] = [
-                        voidString,
-                        voidString,
-                        "Alle Helden sind kampfunfähig",
-                        voidString,
-                        "Ihr habt alle Seelen verloren",
-                        voidString,
-                        "Ihr wacht im Lager auf...",
-                        voidString,
-                        enterString,
-                    ]
-                    generateTerminalWindowWithSoulAndCenterd(topic: looseTopic, printArray: looseStringArray, in: terminalWidth)
-                    _ = readLine()
-                    
-                    fight = false
-            }
-        }
-        if fight {
-            enemiesAction(enemies: enemyTeam, heros: heroTeam)
-            
-           
-            }
-        }
-    }
-}
 
 func generateEnemies(_ level: Int)-> [Enemy]{
-    var enemyTeam: [Enemy] = []
+    var generatedEnemyTeam: [Enemy] = []
     let enemiesCount:Int = Int.random(in: 1...3)
     let fairnessIndex = if maxLvl < 5 && enemiesCount > 1 { 1 } else { 0 }
     for _ in 1...enemiesCount - fairnessIndex {
        
-        enemyTeam.append(availableEnemies[generateEnemyIndexFromRare(enemies: availableEnemies)])
+        generatedEnemyTeam.append(availableEnemies[generateEnemyIndexFromRare(enemies: availableEnemies)])
     }
-    return enemyTeam
+    return generatedEnemyTeam
 }
 
 
@@ -330,74 +380,159 @@ func showEnemiesAndWaitForHeroAction(hero: Hero, enemies: [Enemy]){
 }
 
 
-func showEnemiesAndWaitForHeroActionForTerminal(hero: Hero, herosNames: [String], enemies: [Enemy], enemyNames: [String], topic: String){
-    var newEnemyNames: [String] = enemyNames
-    var aktiveHeroStringArray: [String] = herosNames
+func showEnemiesAndWaitForHeroActionForTerminal(hero: Hero, topic: String){
+    //var newEnemyNames: [String] = enemyNames
+    
     var battleMassages: [String] = []
-        var isHeroNotFinish:Bool = false
+        var isHeroNotFinish:Bool = true
         var critRate: Double = 1.0
-    for i in 0..<aktiveHeroStringArray.count{
-        if aktiveHeroStringArray[i].contains(hero.name){
-            aktiveHeroStringArray[i] = ">> " + aktiveHeroStringArray[i]
-        }else{
-            aktiveHeroStringArray[i] = "   " + aktiveHeroStringArray[i]
+    generateNewFightingHerosForPrint()
+    //var aktiveHeroStringArray: [String] = herosNames
+    for i in 0..<fightingHerosForPrint.count{
+        if !fightingHerosForPrint[i].contains(">>") || !fightingHerosForPrint[i].contains("   "){
+            if fightingHerosForPrint[i].contains(hero.name){
+                fightingHerosForPrint[i] = ">> " + fightingHerosForPrint[i]
+            }else{
+                fightingHerosForPrint[i] = "   " + fightingHerosForPrint[i]
+            }
         }
     }
     battleMassages.append("Was soll \(hero.name) machen?")
     
     
-    battleScreen(topic: topic,actionMessage: battleMassages, enemies: enemyNames, heros: aktiveHeroStringArray, in: terminalWidth)
+    battleScreen(topic: topic, actionMessage: battleMassages, enemies: enemyTeamForPrint, heros: fightingHerosForPrint, in: terminalWidth)
+    
         
-        let heroAction = readNumber()
+        var heroAction = readNumber()
         
         if hero is CanHaveCritDamage{
             let canHaveCritDamage = hero as! CanHaveCritDamage
             critRate = canHaveCritDamage.calculateCritDamage()
         }
         
+    while isHeroNotFinish{
+        
         switch heroAction{
         case 1:
+            
             battleMassages = []
             battleMassages.append("Welcher Gegner soll \(hero.name) angreifen?")
             
-            battleScreen(topic: topic,actionMessage: battleMassages, enemies: enemyNames, heros: aktiveHeroStringArray, in: terminalWidth)
+            //newEnemyNames = checkEnemieStatus(enemies: enemyTeam, enemieNames: enemyTeamForPrint)
             
-            let target = chooseEnemyForTerminal(enemies: enemies)
+            battleScreen(topic: topic,actionMessage: battleMassages, enemies: enemyTeamForPrint, heros: fightingHerosForPrint, in: terminalWidth)
+          
+            let (target, targetIndex, message) = chooseEnemyForTerminal(enemies: enemyTeam)
             
-            battleMassages = []
-            battleMassages.append(contentsOf: hero.basicAttackForTerminal(target, critRate))
+            if targetIndex == 99 {
+                
+                battleMassages = []
+                battleMassages.append(message)
+               // battleMassages.append("Bitte gib einen gültiges Ziel ein")
+                battleScreen(topic: topic,actionMessage: battleMassages, enemies: enemyTeamForPrint, heros: fightingHerosForPrint, in: terminalWidth)
+                sleep(2)
+                
+                isHeroNotFinish = true
+            }else{
+                
+                if message != ""{
+                    battleMassages = []
+                    battleMassages.append(message)
+                    battleScreen(topic: topic,actionMessage: battleMassages, enemies: enemyTeamForPrint, heros: fightingHerosForPrint, in: terminalWidth)
+                }
+                battleMassages = []
+                battleMassages.append(message)
+                
+                battleMassages = []
+                battleMassages.append(contentsOf: hero.basicAttackForTerminal(target, critRate, target: targetIndex))
+                
+                //newEnemyNames = checkEnemieStatus(enemies: enemies, enemieNames: enemyNames) //enemyNames?
+                
+                battleScreen(topic: topic,actionMessage: battleMassages, enemies: enemyTeamForPrint, heros: fightingHerosForPrint, in: terminalWidth)
+                sleep(3)
+                
+                isHeroNotFinish = false
+            }
+            case 2:
             
-            newEnemyNames = checkEnemieStatus(enemies: enemies, enemieNames: enemyNames) //enemyNames?
-            
-            battleScreen(topic: topic,actionMessage: battleMassages, enemies: newEnemyNames, heros: aktiveHeroStringArray, in: terminalWidth)
-            sleep(2)
-            
-            break
-        case 2:
             if !(hero is CanUseSpecialAttack){
                 battleMassages = []
                 battleMassages.append("\(hero.name) kann noch keine Spezialattacke")
                 print("\(hero.name) kann noch keine Spezialattacke")
-                battleScreen(topic: topic,actionMessage: battleMassages, enemies: newEnemyNames, heros: aktiveHeroStringArray, in: terminalWidth)
+               // newEnemyNames = checkEnemieStatus(enemies: enemies, enemieNames: enemyNames)
+                battleScreen(topic: topic,actionMessage: battleMassages, enemies: enemyTeamForPrint, heros: fightingHerosForPrint, in: terminalWidth)
                 sleep(2)
-                showEnemiesAndWaitForHeroActionForTerminal(hero: hero, herosNames: herosNames, enemies: enemies, enemyNames: newEnemyNames, topic: topic)
-            }else{
+                //newEnemyNames = checkEnemieStatus(enemies: enemies, enemieNames: enemyNames)
+                showEnemiesAndWaitForHeroActionForTerminal(hero: hero, topic: topic)
+            }
+            
+            
+            else{
                 let canUseSpecialAttack = hero as! CanUseSpecialAttack
-                let done:Bool = canUseSpecialAttack.useSpecialAttackForTerminal(enemy: chooseEnemy(enemies: enemies), critRate: critRate)
-                if !done{
-                    showEnemiesAndWaitForHeroActionForTerminal(hero: hero, herosNames: herosNames, enemies: enemies, enemyNames: enemyNames, topic: topic)
+                battleMassages = []
+                battleMassages.append("Welchen Gegner soll \(hero.name) angreifen?")
+                
+                battleScreen(topic: topic, actionMessage: battleMassages, enemies: enemyTeamForPrint, heros: fightingHerosForPrint, in: terminalWidth)
+                
+                let (target, targetIndex, message) = chooseEnemyForTerminal(enemies: enemyTeam)
+                
+                if targetIndex == 99{
+                    
+                    battleMassages = []
+                    battleMassages.append(message)
+                    
+                    battleScreen(topic: topic, actionMessage: battleMassages, enemies: enemyTeamForPrint, heros: fightingHerosForPrint, in: terminalWidth)
+                    sleep(2)
+                    
+                    break
+                    
+                }else{
+                    
+                    if message != ""{
+                        battleMassages = []
+                        battleMassages.append(message)
+                        
+                        battleScreen(topic: topic,actionMessage: battleMassages, enemies: enemyTeamForPrint, heros: fightingHerosForPrint, in: terminalWidth)
+                        sleep(3)
+                        heroAction = 2
+                    }else{
+                        
+                        let done:Bool = canUseSpecialAttack.useSpecialAttackForTerminal(enemy: target, critRate: critRate, target: targetIndex)
+                        if !done{
+                            // newEnemyNames = checkEnemieStatus(enemies: enemies, enemieNames: enemyNames)
+                            showEnemiesAndWaitForHeroActionForTerminal(hero: hero, topic: topic)
+                            isHeroNotFinish = true
+                        }else{
+                            isHeroNotFinish = false
+                        }
+                    }
                 }
             }
-            break
+           
         case 3:
-            isHeroNotFinish = showBag(hero: hero)
-            if isHeroNotFinish{
-                showEnemiesAndWaitForHeroAction(hero: hero, enemies: enemies)
+            
+            let useItem: Bool = showBagForTerminal(hero: hero, heroNames: fightingHerosForPrint)
+            
+            if useItem{
+                isHeroNotFinish = !useItem
+            }else{
+                  battleScreen(topic: topic,actionMessage: battleMassages, enemies: enemyTeamForPrint, heros: fightingHerosForPrint, in: terminalWidth)
+                  
+                  heroAction = readNumber()
+                
             }
+            
+            
+
+            
+            
+            
         default:
-            print("Falsche Eingabe")
-            showEnemiesAndWaitForHeroAction(hero: hero, enemies: enemies)
+
+            showEnemiesAndWaitForHeroActionForTerminal(hero: hero, topic: topic)
         }
+    }
+ 
     }
 
 
@@ -417,13 +552,23 @@ func chooseEnemy (enemies: [Enemy]) -> Enemy{
     }
 }
 
-func chooseEnemyForTerminal (enemies: [Enemy]) -> Enemy{
-    if enemies.count(where: {$0.hp > 0}) > 1{
+func chooseEnemyForTerminal (enemies: [Enemy]) -> (Enemy, Int, String){
+    var message: String = ""
+    if enemies.count >= 1{
         let input: Int = readNumber()
-        if input <= enemies.count{
-            return enemies[input - 1]
+        
+        if input <= enemies.count && input > 0{
+            if enemies[input-1].hp <= 0{
+                message = "\(enemies[input-1].name) ist bereits besiegt"
+                return (enemies[input-1], 99, message)
+            }else{
+                return (enemies[input-1], input-1, message)
+            }
+                
         }else{
-            return chooseEnemyForTerminal(enemies: enemies)
+            message = "Gegner nicht gefunden"
+            return (enemies[0], 99, message)
+            
         }
     }else{
         return chooseEnemyForTerminal(enemies: enemies)
@@ -440,12 +585,31 @@ func enemiesAction(enemies: [Enemy], heros: [Hero]){
         }
     }
 }
+func enemiesActionForTerminal(enemies: [Enemy], heros: [Hero]){
+    for enemy in enemies{
+        if enemy.hp > 0{
+            
+            let aliveHeros:[Hero] = heros.filter{$0.hp > 0}
+            let randomHero: Int = Int.random(in: 0...aliveHeros.count - 1)
+            attackHeroForTerminal(enemy: enemy, hero: heros[randomHero])
+        }
+    }
+}
 
 
 func attackHero(enemy: Enemy, hero: Hero){
 
     print("\(enemy.name) greift \(hero.name) mit \(enemy.damage) an")
     hero.hp -= enemy.damage
+    }
+
+func attackHeroForTerminal(enemy: Enemy, hero: Hero){
+    let attackarray: [String] = ["\(enemy.name) greift \(hero.name) mit \(enemy.damage) an"]
+    generateTerminalWindow(topic: "\(enemy.name) greift an", printArray: attackarray, in: terminalWidth)
+
+  sleep(3)
+    hero.hp -= enemy.damage
+   
     }
 
 func restartLevel(heros: [Hero]){
@@ -774,6 +938,55 @@ func showBag(hero: Hero) -> Bool{
     return true
 }
 
+func showBagForTerminal(hero: Hero, heroNames: [String]) -> Bool{
+    var finished: Bool = false
+    let showBagTopic = "Beutel"
+    var showBagStringArray: [String] = []
+        
+        let filteredPotionList = inventory.potions.filter { $0.amount > 0}
+        
+        for (i, potion) in filteredPotionList.enumerated() {
+            showBagStringArray.append("[\(i+1)] \(potion.name)  Anzahl: \(potion.amount)  - \(potion.description)")
+            showBagStringArray.append(voidString)
+            
+           
+        }
+        if filteredPotionList.count > 0{
+            
+            showBagStringArray.append("Wähle ein Item ([99] für Abbruch)")
+            
+            generateTerminalWindow(topic: showBagTopic, printArray: showBagStringArray, in: terminalWidth)
+            
+            let choosePotionNr = readNumber()
+            
+            if choosePotionNr <= filteredPotionList.count && choosePotionNr > 0{
+                
+                
+                let choosenPotion = filteredPotionList[choosePotionNr-1]
+                if choosePotionNr >= filteredPotionList.count  {
+                }
+                finished = usePotionInBattleForTerminal(choosenPotion, heroNames: heroNames)
+                
+                return finished
+                
+            }else{
+                return finished
+            }
+        }else{
+            showBagStringArray.append(voidString)
+            showBagStringArray.append(voidString)
+            showBagStringArray.append(voidString)
+            showBagStringArray.append("Dein Beutel ist leer")
+            generateTerminalWindow(topic: showBagTopic, printArray: showBagStringArray, in: terminalWidth)
+            sleep(2)
+            
+            return finished
+            
+        }
+        
+
+}
+
 func usePotionInBattle(_ potion: Potion){
     print("Bei wem möchtest du \(potion.name) benutzen?\n")
     printFightingTeam()
@@ -789,6 +1002,62 @@ func usePotionInBattle(_ potion: Potion){
             potion.amount -= 1
         }
     }
+}
+
+func usePotionInBattleForTerminal(_ potion: Potion, heroNames: [String]) -> Bool{
+    var usedPotion = false
+    let showBagTopic = "\(potion.name)"
+    var showBagStringArray: [String] = []
+    showBagStringArray.append(voidString)
+    showBagStringArray.append("Bei wem möchtest du \(potion.name) benutzen?")
+    showBagStringArray.append(voidString)
+    showBagStringArray.append(contentsOf:heroNames)
+    
+    generateTerminalWindow(topic: showBagTopic, printArray: showBagStringArray, in: terminalWidth)
+    
+    let chooseHero = readNumber()
+    if chooseHero <= fightingHeros.count && chooseHero > 0{
+        
+        if heroNames[chooseHero-1].contains("HP: 0"){
+            showBagStringArray = []
+            showBagStringArray.append(voidString)
+            showBagStringArray.append(voidString)
+            showBagStringArray.append(voidString)
+            showBagStringArray.append("\(fightingHeros[chooseHero-1].name) ist bereits tot!")
+            showBagStringArray.append("Er kann nicht geheilt werden!")
+            
+            usedPotion = false
+        }else{
+            
+            if potion.potionType == 1{
+                fightingHeros[chooseHero-1].hp += potion.amountOfHeal
+                print("\(fightingHeros[chooseHero-1].name)´s HP wurde um \(potion.amountOfHeal) geheilt!")
+                potion.amount -= 1
+                showBagStringArray = []
+                showBagStringArray.append(voidString)
+                showBagStringArray.append(voidString)
+                showBagStringArray.append(voidString)
+                showBagStringArray.append("\(fightingHeros[chooseHero-1].name)´s HP wurde um \(potion.amountOfHeal) geheilt!")
+                generateTerminalWindow(topic: showBagTopic, printArray: showBagStringArray, in: terminalWidth)
+                usedPotion = true
+                
+            }else{
+                fightingHeros[chooseHero-1].mp += potion.amountOfHeal
+                showBagStringArray = []
+                showBagStringArray.append(voidString)
+                showBagStringArray.append(voidString)
+                showBagStringArray.append(voidString)
+                showBagStringArray.append("\(fightingHeros[chooseHero-1].name)´MP wurde um \(potion.amountOfHeal) regeneriert!")
+                print("\(fightingHeros[chooseHero-1].name)´MP wurde um \(potion.amountOfHeal) regeneriert!")
+                potion.amount -= 1
+                usedPotion = true
+                
+            }
+            return usedPotion
+        }
+        return usedPotion
+    }
+    return usedPotion
 }
 
 func printFightingTeam(){
@@ -973,14 +1242,14 @@ func generateLootForTerminal(enemies: [Enemy], lvl: Int) -> [String] {
 }
 
 
-func checkEnemieStatus(enemies: [Enemy], enemieNames: [String]) -> [String] {
+/*func checkEnemieStatus(enemies: [Enemy], enemieNames: [String]) -> [String] {
     var newEnemieNamesString: [String] = enemieNames
     for i in 0..<enemieNames.count{
         if enemieNames[i].contains(enemies[i].name){
-            if enemies[i].hp < enemies[i].fullHp/2 && !enemieNames[i].contains("(geschwächt)") {
+            if enemies[i].hp <= enemies[i].fullHp/2 && enemies[i].hp > (enemies[i].fullHp / 5) && !enemieNames[i].contains("(geschwächt)") {
                 newEnemieNamesString[i] = newEnemieNamesString[i] + "(geschwächt)"
             }
-            if enemies[i].hp < (enemies[i].fullHp / 5) && !enemieNames[i].contains("(taumelt)") {
+            if enemies[i].hp <= (enemies[i].fullHp / 5) && enemies[i].hp > 0 && !enemieNames[i].contains("(taumelt)") {
                 newEnemieNamesString[i] = newEnemieNamesString[i] + "(taumelt)"
             }
             if enemies[i].hp <= 0 && !enemieNames[i].contains("XXX") {
@@ -989,5 +1258,20 @@ func checkEnemieStatus(enemies: [Enemy], enemieNames: [String]) -> [String] {
         }
     }
     return newEnemieNamesString
+}*/
+func renerateHeroStatus(herosNames: [String], hero: Hero)->[String]{
+    var aktiveHeroStringArray: [String] = herosNames
+    for i in 0..<aktiveHeroStringArray.count{
+        if !aktiveHeroStringArray[i].contains(">>") || !aktiveHeroStringArray[i].contains("   "){
+            if aktiveHeroStringArray[i].contains(hero.name){
+                aktiveHeroStringArray[i] = ">> " + aktiveHeroStringArray[i]
+            }else{
+                aktiveHeroStringArray[i] = "   " + aktiveHeroStringArray[i]
+            }
+        }
+    }
+    return aktiveHeroStringArray
 }
+
+
 

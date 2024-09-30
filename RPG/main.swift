@@ -12,35 +12,21 @@ var isEnded: Bool = false
 let enterString: String = "Drücke Enter für weiter"
 
 let terminalWidth: Int = 92
+let terminalHeight: Int = 22
+let frequenz: Double = 0.01
 
 
-
-// Tests:
-//print(availableEnemies[generateEnemyIndexFromRare(enemies: availableEnemies)].name)
-//print(sword1)
-/*print(kirito.weapontype1)
-print(kirito.weapontype2)
-print(kirito.name)
-print(kirito.def)
-print(kirito.dex)
-print(kirito.fullHp)
-print(kirito.fullMp)
-print(kirito.mp)
-print(kirito.hp)
-print(kirito.int)
-print(kirito.lvl)
-*/
-//kirito.printDetails()
-//myInventory.printMymyInventory()
-
-// Startbildschirm
 
 let GlobalTerminal: Int = 1
+
 scaleTerminal()
 _ = readLine()
-//openGate()
-//startScreen(terminal: GlobalTerminal)
-//_ = readLine()
+fadeinWindow(height: terminalHeight, width: terminalWidth, speed: frequenz)
+
+fadeoutWindow(height: terminalHeight, width: terminalWidth, speed: frequenz)
+startScreen(terminal: GlobalTerminal)
+_ = readLine()
+fadeinWindow(height: terminalHeight, width: terminalWidth, speed: frequenz)
     
     // Characterwahl
 
@@ -49,6 +35,7 @@ let chosenHero: String = choseStartCharacterWindow(terminal: GlobalTerminal)
 
 
 choseStartCharacter(terminal: GlobalTerminal, hero: chosenHero)
+
 
 
 campMenu(terminal: GlobalTerminal)

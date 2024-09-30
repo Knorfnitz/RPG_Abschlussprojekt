@@ -79,9 +79,12 @@ func showCampMenuForTerminal()-> String{
     
     campMenuStringArray.append(contentsOf: generateHerosStringArray)
 
+    fadeoutWindow(height: terminalHeight, width: terminalWidth, speed: frequenz)
     generateTerminalWindowWithSouls(topic: "Lager", printArray: campMenuStringArray, in: terminalWidth)
     
     menue = readLine()
+
+   
     return menue!
 }
 
@@ -450,18 +453,20 @@ func swapHeroTeamForTerminal(heros: [Hero]) -> [Hero]{
     swapHeroStringArray.append(voidString)
     swapHeroStringArray.append("Wähle den ersten Helden aus:")
     
+    
     generateTerminalWindowWithSouls(topic: "Team tauschen", printArray: swapHeroStringArray, in: terminalWidth)
     
     var chooseHero1ToSwap: Int = readNumber()
+ 
     
     if chooseHero1ToSwap <= 0 || chooseHero1ToSwap > heros.count  { chooseHero1ToSwap = 1 }
 
     swapHeroStringArray.append(voidString)
     swapHeroStringArray.append("Mit wem möchtest du \(heros[chooseHero1ToSwap - 1].name) tauschen?")
-    
+   
     generateTerminalWindowWithSouls(topic: "Team tauschen", printArray: swapHeroStringArray, in: terminalWidth)
-  
     var chooseHero2ToSwap: Int = readNumber()
+    
 
     if chooseHero2ToSwap <= 0 || chooseHero2ToSwap > heros.count { chooseHero2ToSwap = 1 }
         
@@ -474,7 +479,9 @@ func swapHeroTeamForTerminal(heros: [Hero]) -> [Hero]{
     swapHeroStringArray.append(voidString)
     swapHeroStringArray.append(enterString)
     
+
     generateTerminalWindowWithSouls(topic: "Team tauschen", printArray: swapHeroStringArray, in: terminalWidth)
+   
     
     _ = readLine()
     

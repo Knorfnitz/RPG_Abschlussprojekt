@@ -138,7 +138,7 @@ class Druid: Hero, CanUseSpecialAttack, CanHaveCritDamage {
     }
     
     
-    func useSpecialAttackForTerminal(enemy: Enemy, critRate: Double) -> Bool {
+    func useSpecialAttackForTerminal(enemy: Enemy, critRate: Double, target: Int) -> Bool {
         
         let specialTopic = "Spezialattacken von \(name)"
         var attackStringArray: [String] = []
@@ -151,10 +151,10 @@ class Druid: Hero, CanUseSpecialAttack, CanHaveCritDamage {
         
         //Schadenberechnungen:
         
-        let damageAttack1: Int = int * 2 * lvl
-        let damageAttack2: Int = (int + str) * 2 * lvl
-        let damageAttack3: Int = (int + str) * 3 * lvl
-        let damageAttack4: Int = (int + str) * 5 * lvl
+        let damageAttack1: Int = int * 3
+        let damageAttack2: Int = (int + str) * 3
+        let damageAttack3: Int = (int + str) * 4
+        let damageAttack4: Int = (int + str) * 5
         
         //MP kosten:
         
@@ -184,123 +184,209 @@ class Druid: Hero, CanUseSpecialAttack, CanHaveCritDamage {
         let choice: Int = readNumber()
         
         if choice == 1 {
-            mp -= mpCosts1
-            var calculateEndDamage = Int(Double(damageAttack1 - enemy.defense) * critRate)
-            if calculateEndDamage <= 0 {
-              
+            
+            if mp < mpCosts1 {
+                
                 attackStringArray = []
                 attackStringArray.append(voidString)
+                attackStringArray.append("Nicht genug MP!")
                 attackStringArray.append(voidString)
-                attackStringArray.append("Der Gegner ist zu stark, du machst keinen Damage!")
                 
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
-                calculateEndDamage = 0
+                
+                sleep(2)
+                
+                return false
+                
             }else{
-                enemy.hp -= (damageAttack1 - enemy.defense)
                 
-                attackStringArray = []
-                attackStringArray.append(voidString)
-                attackStringArray.append(voidString)
-                attackStringArray.append("\(name) benutzt \(attackName1) und verursacht")
-                attackStringArray.append("\(calculateEndDamage) Schaden an \(enemy.name)")
-            
-                if critRate > 1{
+                mp -= mpCosts1
+                var calculateEndDamage = Int(Double(damageAttack1 - enemy.defense) * critRate)
+                if calculateEndDamage <= 0 {
+                    
+                    attackStringArray = []
                     attackStringArray.append(voidString)
-                    attackStringArray.append("Der Angriff war kritsch!")
+                    attackStringArray.append(voidString)
+                    attackStringArray.append("Der Gegner ist zu stark, du machst keinen Damage!")
+                    
+                    calculateEndDamage = 0
+                }else{
+                    // enemy.hp -= (damageAttack1 - enemy.defense)
+                    
+                    attackStringArray = []
+                    attackStringArray.append(voidString)
+                    attackStringArray.append(voidString)
+                    attackStringArray.append("\(name) benutzt \(attackName1) und verursacht")
+                    attackStringArray.append("\(calculateEndDamage) Schaden an \(enemy.name)")
+                    attackStringArray.append(checkEnemyHealth(enemy: enemy, target: target))
+                    
+                    if critRate > 1{
+                        attackStringArray.append(voidString)
+                        attackStringArray.append("Der Angriff war kritsch!")
+                        
+                    }
                 }
-                
+                enemy.hp -= calculateEndDamage
+                attackStringArray.append(voidString)
+                attackStringArray.append(checkEnemyHealth(enemy: enemy, target: target))
+                attackStringArray.append(voidString)
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
+                sleep(3)
+                
+                return true
             }
-            
-            enemy.hp -= calculateEndDamage
-            return true
             
         }else if choice == 2 && lvl >= 5{
-            mp -= mpCosts2
-            var calculateEndDamage = Int(Double(damageAttack2 - enemy.defense) * critRate)
-            if calculateEndDamage <= 0 {
+            
+            if mp < mpCosts1 {
                 attackStringArray = []
                 attackStringArray.append(voidString)
+                attackStringArray.append("Nicht genug MP!")
                 attackStringArray.append(voidString)
-                attackStringArray.append("Der Gegner ist zu stark, du machst keinen Damage!")
                 
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
-                calculateEndDamage = 0
+                
+                sleep(2)
+                
+                return false
                 
             }else{
-                enemy.hp -= (damageAttack2 - enemy.defense)
-                attackStringArray = []
-                attackStringArray.append(voidString)
-                attackStringArray.append(voidString)
-                attackStringArray.append("\(name) benutzt \(attackName1) und verursacht")
-                attackStringArray.append("\(calculateEndDamage) Schaden an \(enemy.name)")
-                if critRate > 1{
-                    attackStringArray.append(voidString)
-                    attackStringArray.append("Der Angriff war kritsch!")
-                }
-            }
-            enemy.hp -= calculateEndDamage
-            return true
-            
-        }else if choice == 3 && lvl >= 5{
-            mp -= mpCosts3
-            var calculateEndDamage = Int(Double(damageAttack3 - enemy.defense) * critRate)
-            if calculateEndDamage <= 0 {
-                print("Der Gegner ist zu stark, du machst keinen Damage!\n")
-                attackStringArray = []
-                attackStringArray.append(voidString)
-                attackStringArray.append(voidString)
-                attackStringArray.append("Der Gegner ist zu stark, du machst keinen Damage!")
                 
-                generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
-                calculateEndDamage = 0
-            }else{
-                enemy.hp -= (damageAttack3 - enemy.defense)
-                attackStringArray = []
-                attackStringArray.append(voidString)
-                attackStringArray.append(voidString)
-                attackStringArray.append("\(name) benutzt \(attackName1) und verursacht")
-                attackStringArray.append("\(calculateEndDamage) Schaden an \(enemy.name)")
-                if critRate > 1{
+                mp -= mpCosts2
+                var calculateEndDamage = Int(Double(damageAttack2 - enemy.defense) * critRate)
+                if calculateEndDamage <= 0 {
+                    attackStringArray = []
                     attackStringArray.append(voidString)
-                    attackStringArray.append("Der Angriff war kritsch!")
+                    attackStringArray.append(voidString)
+                    attackStringArray.append("Der Gegner ist zu stark, du machst keinen Damage!")
+                    
+                    generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
+                    sleep(3)
+                    calculateEndDamage = 0
+                    
+                }else{
+                    //enemy.hp -= (damageAttack2 - enemy.defense)
+                    attackStringArray = []
+                    attackStringArray.append(voidString)
+                    attackStringArray.append(voidString)
+                    attackStringArray.append("\(name) benutzt \(attackName1) und verursacht")
+                    attackStringArray.append("\(calculateEndDamage) Schaden an \(enemy.name)")
+                    attackStringArray.append(checkEnemyHealth(enemy: enemy, target: target))
+                    
+                    if critRate > 1{
+                        attackStringArray.append(voidString)
+                        attackStringArray.append("Der Angriff war kritsch!")
+                    }
+                    
                 }
-            }
-            enemy.hp -= calculateEndDamage
-            return true
-            
-        }else if choice == 4 && lvl >= 5{
-            mp -= mpCosts4
-            var calculateEndDamage = Int(Double(damageAttack4 - enemy.defense) * critRate)
-            if calculateEndDamage <= 0 {
-                attackStringArray = []
+                enemy.hp -= calculateEndDamage
                 attackStringArray.append(voidString)
-                attackStringArray.append(voidString)
-                attackStringArray.append("Der Gegner ist zu stark, du machst keinen Damage!")
+                attackStringArray.append(checkEnemyHealth(enemy: enemy, target: target))
                 
                 generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
-                calculateEndDamage = 0
-            }else{
-                enemy.hp -= (damageAttack4 - enemy.defense)
+                sleep(3)
+                
+                return true
+            }
+            
+        }else if choice == 3 && lvl >= 15{
+            
+            if mp < mpCosts3 {
                 attackStringArray = []
                 attackStringArray.append(voidString)
+                attackStringArray.append("Nicht genug MP!")
                 attackStringArray.append(voidString)
-                attackStringArray.append("\(name) benutzt \(attackName1) und verursacht")
-                attackStringArray.append("\(calculateEndDamage) Schaden an \(enemy.name)")
-                if critRate > 1{
+                
+                generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
+                sleep(2)
+                return false
+                
+            }else{
+                mp -= mpCosts3
+                var calculateEndDamage = Int(Double(damageAttack3 - enemy.defense) * critRate)
+                if calculateEndDamage <= 0 {
+                    print("Der Gegner ist zu stark, du machst keinen Damage!\n")
+                    attackStringArray = []
                     attackStringArray.append(voidString)
-                    attackStringArray.append("Der Angriff war kritsch!")
+                    attackStringArray.append(voidString)
+                    attackStringArray.append("Der Gegner ist zu stark, du machst keinen Damage!")
+                    
+                    generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
+                    sleep(3)
+                    calculateEndDamage = 0
+                }else{
+                    //enemy.hp -= (damageAttack3 - enemy.defense)
+                    attackStringArray = []
+                    attackStringArray.append(voidString)
+                    attackStringArray.append(voidString)
+                    attackStringArray.append("\(name) benutzt \(attackName1) und verursacht")
+                    attackStringArray.append("\(calculateEndDamage) Schaden an \(enemy.name)")
+                    attackStringArray.append(checkEnemyHealth(enemy: enemy, target: target))
+                    if critRate > 1{
+                        attackStringArray.append(voidString)
+                        attackStringArray.append("Der Angriff war kritsch!")
+                    }
+                    
                 }
+                enemy.hp -= calculateEndDamage
+                attackStringArray.append(voidString)
+                attackStringArray.append(checkEnemyHealth(enemy: enemy, target: target))
+                generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
+                sleep(3)
+                return true
             }
-            enemy.hp -= calculateEndDamage
-            return true
             
+        }else if choice == 4 && lvl >= 30{
+            if mp < mpCosts4 {
+                attackStringArray = []
+                attackStringArray.append(voidString)
+                attackStringArray.append("Nicht genug MP!")
+                attackStringArray.append(voidString)
+                
+                generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
+                sleep(2)
+                return false
+                
+            }else{
+                mp -= mpCosts4
+                var calculateEndDamage = Int(Double(damageAttack4 - enemy.defense) * critRate)
+                if calculateEndDamage <= 0 {
+                    attackStringArray = []
+                    attackStringArray.append(voidString)
+                    attackStringArray.append(voidString)
+                    attackStringArray.append("Der Gegner ist zu stark, du machst keinen Damage!")
+                    
+                    generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
+                    calculateEndDamage = 0
+                }else{
+                    // enemy.hp -= (damageAttack4 - enemy.defense)
+                    attackStringArray = []
+                    attackStringArray.append(voidString)
+                    attackStringArray.append(voidString)
+                    attackStringArray.append("\(name) benutzt \(attackName1) und verursacht")
+                    attackStringArray.append("\(calculateEndDamage) Schaden an \(enemy.name)")
+                    
+                    attackStringArray.append(checkEnemyHealth(enemy: enemy, target: target))
+                    if critRate > 1{
+                        attackStringArray.append(voidString)
+                        attackStringArray.append("Der Angriff war kritsch!")
+                    }
+                    
+                }
+                enemy.hp -= calculateEndDamage
+                attackStringArray.append(voidString)
+                attackStringArray.append(checkEnemyHealth(enemy: enemy, target: target))
+                generateTerminalWindow(topic: specialTopic, printArray: attackStringArray, in: terminalWidth)
+                sleep(3)
+                return true
+            }
         }else if choice == 9{
+            
             return false
         }else{
             print("Falsche Eingabe!")
             sleep(2)
-            _ = useSpecialAttackForTerminal(enemy: enemy, critRate: critRate)
+            _ = useSpecialAttackForTerminal(enemy: enemy, critRate: critRate, target: target)
         }
         
         return true

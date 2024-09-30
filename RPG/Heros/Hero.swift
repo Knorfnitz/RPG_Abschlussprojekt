@@ -9,16 +9,15 @@ class Hero{
         didSet {
             //let oldname: String = name
             if hp <= fullHp/2 && oldValue > fullHp / 2 {
-                print("\(name) ist geschwächt")
+              //  print("\(name) ist geschwächt")
                 
             }
             if hp <= Int((Double(fullHp) * 0.2)) && oldValue > Int((Double(fullHp) * 0.2)) {
-                print("\(name) taumelt!")
+               // print("\(name) taumelt!")
                 
             }
             if hp <= 0 && oldValue > 0{
-                print("\(name) wurde besiegt")
-                name = strikethrough + name + reset
+             //   print("\(name) wurde besiegt")
                 hp = 0
             }
             if hp > fullHp {
@@ -60,9 +59,13 @@ class Hero{
         self.armor = armor
     }
     
+    var heroForPrint: String {
+        return "\(name) - HP: \(hp)/\(fullHp), MP: \(mp)/\(fullMp)"}
+    
+    
     func basicAttack(_ enemy: Enemy, _ critRate: Double){
         
-        var damage = Int(Double(self.str - enemy.defense) * critRate)
+        var damage = Int(Double(self.str * 2 - enemy.defense) * critRate)
         
         if damage <= 0 {
             damage = 0
@@ -77,7 +80,7 @@ class Hero{
     
     }
     
-    func basicAttackForTerminal(_ enemy: Enemy, _ critRate: Double) -> [String]{
+    func basicAttackForTerminal(_ enemy: Enemy, _ critRate: Double, target: Int) -> [String]{
         var basicAttackMessages: [String] = []
         var damage = Int(Double(self.str - enemy.defense) * critRate)
         
@@ -90,17 +93,43 @@ class Hero{
             if critRate > 1 {
                 basicAttackMessages.append(voidString)
                 basicAttackMessages.append("Der Angriff war kritisch!")
+                basicAttackMessages.append(voidString)
             }
         }
         enemy.hp -= damage
+        
+        basicAttackMessages.append(checkEnemyHealth(enemy: enemy, target: target))
         return basicAttackMessages
     }
     
+    func checkEnemyHealth(enemy: Enemy, target: Int) -> String{
+        
+        
+        let tot: String = " X(tot)X"
+        let taumelt: String = " (taumelt)"
+        let geschwaecht: String = " (geschwächt)"
+        
+        var string: String = ""
+        enemyTeamForPrint[target] = enemyTeamForPrint[target].replacingOccurrences(of: tot, with: "")
+        enemyTeamForPrint[target] = enemyTeamForPrint[target].replacingOccurrences(of: taumelt, with: "")
+        enemyTeamForPrint[target] = enemyTeamForPrint[target].replacingOccurrences(of: geschwaecht, with: "")
 
-
+        
+        if enemy.hp <= 0 && !enemyTeamForPrint[target].contains(tot){
+            string = "\(enemy.name) wurde besiegt"
+            enemyTeamForPrint[target] = enemyTeamForPrint[target] + tot
+        } else if enemy.hp <= fullHp/5 && enemy.hp > 0 && !enemyTeamForPrint[target].contains(taumelt){
+            string = "\(enemy.name) taumelt"
+            enemyTeamForPrint[target] = enemyTeamForPrint[target] + taumelt
+        }else if enemy.hp <= fullHp/2 && enemy.hp > fullHp/5 && !enemyTeamForPrint[target].contains(geschwaecht){
+            string = "\(enemy.name) ist geschwächt"
+            enemyTeamForPrint[target] = enemyTeamForPrint[target] + geschwaecht
+        }
+        return string
+    }
     
     
- 
+    
     
     func printDetails() {
         print("""

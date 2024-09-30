@@ -444,11 +444,13 @@ func choseStartCharacterWindow(terminal: Int) -> String{
         clearScreen()
         
     let Heronames = [voidString, "[1] Kirito", "[2] Radagast", "[3] Aragorn", "[4] Shion", "[5] Milim", "[6] Rias"]
+        fadeoutWindow(height: terminalHeight, width: terminalWidth, speed: frequenz)
         
         generateTerminalWindow(topic: "Wähle einen Helden:", printArray: Heronames, in: terminalWidth)
         
         let heroNumber = readLine()!
-        
+        fadeinWindow(height: terminalHeight, width: terminalWidth, speed: frequenz)
+    
         return heroNumber
 
     }
@@ -854,10 +856,10 @@ if terminal == 0{
                                                           "\(voidString)",
                                                           "Weiter mit Enter...",
                                                           "oder Abbrechen mit belibiger Eingabe."]
-                  
+                fadeoutWindow(height: terminalHeight, width: terminalWidth, speed: frequenz)
                        generateTerminalWindow(topic: voidString, printArray: cheatCharacterStringArray, in: terminalWidth)
-                
                 input = confirm(readLine()!)
+                fadeinWindow(height: terminalHeight, width: terminalWidth, speed: frequenz)
                 if input == ""{
                     createCheatTeam()
                 }
@@ -940,8 +942,10 @@ func campMenu(terminal: Int){
         while !isEnded{
             switch menue {
             case "0":
-                
+                fadeinWindow(height: terminalHeight, width: terminalWidth, speed: frequenz)
+                fadeoutWindow(height: terminalHeight, width: terminalWidth, speed: frequenz)
                 menue = showCampMenuForTerminal()
+           
                 
             case "1":
                 let newHeroOrder: [Hero] = swapHeroTeamForTerminal(heros: heroTeam)
@@ -1029,7 +1033,7 @@ func battleScreen(topic: String,actionMessage: [String], enemies: [String], hero
 
 func leftStringArrayStartCenter(_ strings: [String], in width: Int) -> [String] {
     
-        let paddingLeft = (width / 2) + 15
+        let paddingLeft = (width / 2) + 5
         var paddingRight: Int = 0
         var stringArrayWithPadding: [String] = []
     
@@ -1057,10 +1061,6 @@ func twoRowsStringArrayWithActionMenu(stringsRight: [String], in width: Int) -> 
     var stringArrayWithPadding: [String] = []
 
     switch stringsRight.count {
-        case 0:
-            rightStringArray.append(voidString)
-            rightStringArray.append(voidString)
-            rightStringArray.append(voidString)
         case 1:
             rightStringArray.append(stringsRight[0])
             rightStringArray.append(voidString)
@@ -1072,7 +1072,7 @@ func twoRowsStringArrayWithActionMenu(stringsRight: [String], in width: Int) -> 
         case 3:
             rightStringArray.append(stringsRight[0])
             rightStringArray.append(stringsRight[1])
-            rightStringArray.append(stringsRight[1])
+            rightStringArray.append(stringsRight[2])
         default:
             print("Kann nicht sein")
         }
@@ -1081,10 +1081,98 @@ func twoRowsStringArrayWithActionMenu(stringsRight: [String], in width: Int) -> 
         //zum Punkt breite/2 + 2 = paddingLeft + string + x
         paddingMiddle =  ((width/2) - 10) - string.count - paddingLeft
         //Restpadding x = breite - paddingLeft - stringLeft - paddingMitte - stringRight +1 für emoji count
-        paddingRight = width - paddingLeft - string.count - paddingMiddle - stringsRight[i].count
+        paddingRight = width - paddingLeft - string.count - paddingMiddle - rightStringArray[i].count
         
-        stringArrayWithPadding.append("⬛️" + String(repeating: " ", count: paddingLeft) + string + String(repeating: " ", count: paddingMiddle) + stringsRight[i] + String(repeating: " ", count: paddingRight) + "⬛️")
+        stringArrayWithPadding.append("⬛️" + String(repeating: " ", count: paddingLeft) + string + String(repeating: " ", count: paddingMiddle) + rightStringArray[i] + String(repeating: " ", count: paddingRight) + "⬛️")
     }
     return stringArrayWithPadding
     
+}
+
+func fadeoutWindow(height h: Int, width w: Int, speed: Double){
+    let borderEmoji = "⬛️"  // Du kannst hier jedes Emoji einsetzen
+        let emptySpace = "  "  // Leerzeichen für den inneren Bereich, doppelt so breit
+        
+        // Berechne die Mitte des Fensters
+        let centerX = w / 2
+        let centerY = h / 2
+        
+        var currentWidth = 4  // Startbreite (doppelte Zeichen zählen als 2)
+        var currentHeight = 2  // Starthöhe
+        
+        while currentWidth <= w {
+            // Berechne den Startpunkt für die aktuelle Rechteckgröße
+            let startX = max(centerX - currentWidth / 2, 0)
+            let startY = max(centerY - currentHeight / 2, 0)
+            
+            // Ausgabe für jede Zeile des Rechtecks
+            for y in 0..<h {
+                if y >= startY && y < startY + currentHeight {
+                    if y == startY || y == startY + currentHeight - 1 {
+                        // Obere und untere Zeilen komplett mit Emoji (Rahmen)
+                        let row = String(repeating: " ", count: startX) + String(repeating: borderEmoji, count: currentWidth / 2)
+                        print(row)
+                    } else {
+                        // Innenräume mit Leerzeichen und Emoji-Rahmen an den Seiten
+                        let row = String(repeating: " ", count: startX) + borderEmoji + String(repeating: emptySpace, count: (currentWidth - 4) / 2) + borderEmoji
+                        print(row)
+                    }
+                } else {
+                    // Leere Zeile außerhalb des Rechtecks
+                    print(String(repeating: " ", count: w))
+                }
+            }
+            
+            // Vergrößere das Rechteck
+            currentWidth += 4  // Breite erhöht sich weiterhin
+            if currentHeight < h {
+                currentHeight += 2  // Höhe erhöht sich nur bis zur maximalen Höhe
+            }
+            
+           
+            clearScreenAndWait(speed)
+        }
+  
+}
+
+
+func fadeinWindow(height h: Int, width w: Int, speed: Double) {
+    // Emoji-Zeichen für die Rahmen
+    let borderEmoji = "⬛️"  // Du kannst hier jedes Emoji einsetzen
+    let emptySpace = "  "   // Leerzeichen für den inneren Bereich, doppelt so breit
+    
+    var currentWidth = w    // Startbreite
+    var currentHeight = h   // Starthöhe
+    
+    while currentWidth > 2 && currentHeight > 2 {
+        // Berechne den Startpunkt für die aktuelle Rechteckgröße
+        let centerX = w / 2
+        let centerY = h / 2
+        let startX = max(centerX - currentWidth / 2, 0)
+        let startY = max(centerY - currentHeight / 2, 0)
+        
+        // Ausgabe für jede Zeile des Rechtecks
+        for y in 0..<h {
+            if y >= startY && y < startY + currentHeight {
+                if y == startY || y == startY + currentHeight - 1 {
+                    // Obere und untere Zeilen komplett mit Emoji (Rahmen)
+                    let row = String(repeating: " ", count: startX) + String(repeating: borderEmoji, count: currentWidth / 2)
+                    print(row)
+                } else {
+                    // Innenräume mit Leerzeichen und Emoji-Rahmen an den Seiten
+                    let row = String(repeating: " ", count: startX) + borderEmoji + String(repeating: emptySpace, count: (currentWidth - 4) / 2) + borderEmoji
+                    print(row)
+                }
+            } else {
+                // Leere Zeile außerhalb des Rechtecks
+                print(String(repeating: " ", count: w))
+            }
+        }
+        
+        // Verkleinere das Rechteck
+        currentWidth -= 4  // Reduziere die Breite um 4 Zeichen (wegen Emoji)
+        currentHeight -= 2 // Reduziere die Höhe um 2 Zeilen
+        
+        clearScreenAndWait(speed)
+    }
 }

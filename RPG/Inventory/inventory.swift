@@ -45,7 +45,10 @@ class Inventory {
         voidString,
         "Wähle eine Kategorie."
         ]
+       
         generateTerminalWindowWithSouls(topic: inventoryTopic, printArray: inventoryStringArray, in: terminalWidth)
+       
+        
         let choosenCategory: Int = readNumber()
         
         switch choosenCategory {
@@ -102,7 +105,9 @@ class Inventory {
         if filteredPotionList.count > 0{
             potionStringArray.append(voidString)
             potionStringArray.append("Wähle ein Item ([99] für Abbruch)")
+           
             generateTerminalWindowWithSouls(topic: potionTopic, printArray: potionStringArray, in: terminalWidth)
+        
             let choosePotionNr = readNumber()
             if choosePotionNr <= filteredPotionList.count && choosePotionNr > 0{
                 let choosenPotion = filteredPotionList[choosePotionNr-1]
@@ -112,8 +117,10 @@ class Inventory {
         }else{
             potionStringArray.append(voidString)
             potionStringArray.append("Keine Potions vorhanden")
-            print()
+           
+         
             generateTerminalWindowWithSouls(topic: potionTopic, printArray: potionStringArray, in: terminalWidth)
+         
             _ = readLine()
         }
     }
@@ -270,7 +277,9 @@ class Inventory {
         voidString,
         "[9] Abbruch"
         ]
+      
         generateTerminalWindowWithSouls(topic: waitForPotionActionTopic, printArray: waitForPotionStringArray, in: terminalWidth)
+        
         let choosenAction = readNumber()
         switch choosenAction{
         case 1:
@@ -437,11 +446,15 @@ class Inventory {
         usePotionStrngArray.append(contentsOf: printHeroTeamForItemsForTerminal())
         usePotionStrngArray.append(voidString)
         
+       
         generateTerminalWindowWithSouls(topic: usePotionTopic, printArray: usePotionStrngArray, in: terminalWidth)
         
         let chooseHero = readNumber()
+      
         
         if chooseHero > 0 && chooseHero <= heroTeam.count {
+            
+            
             
             if potion.potionType == 1{
                 usePotionStrngArray = []
@@ -453,7 +466,9 @@ class Inventory {
                 usePotionStrngArray.append("\(heroTeam[chooseHero-1].name)´s HP wurde um \(potion.amountOfHeal) geheilt!")
                 potion.amount -= 1
                 
+              
                 generateTerminalWindowWithSoulAndCenterd(topic: usePotionTopic, printArray: usePotionStrngArray, in: terminalWidth)
+          
                 
             }else{
                 usePotionStrngArray = []
@@ -466,7 +481,10 @@ class Inventory {
                 usePotionStrngArray.append("\(heroTeam[chooseHero-1].name)´MP wurde um \(potion.amountOfHeal) regeneriert!")
                 
                 potion.amount -= 1
+                
+             
                 generateTerminalWindowWithSoulAndCenterd(topic: usePotionTopic, printArray: usePotionStrngArray, in: terminalWidth)
+            
             }
         }
         }

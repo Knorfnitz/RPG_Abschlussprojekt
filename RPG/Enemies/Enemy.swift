@@ -1,29 +1,36 @@
 import Foundation
 
 class Enemy{
-    var name: String
+    var name: String{
+        didSet{
+            switch rare {
+            case ..<2:
+                prefix = "👻"
+            case 2..<3:
+                prefix = "👿"
+            case 3..<4:
+                prefix = "👺"
+            case 4..<10:
+              prefix = "💀"
+            case 10:
+                prefix = "😼"
+            default :
+                prefix = "❓"
+            }
+        }
+    }
     var fullHp: Int
     var hp: Int {
         didSet{
 
-            if hp <= fullHp/2 && oldValue > fullHp / 2 {
-                //print("\(name) ist geschwächt")
-                let oldName = name
-                name = "\(oldName) (geschwächt)"
-            
+            if hp <= fullHp/2 {
+               // suffix = " (geschwächt)"
             }
             if hp <= Int((Double(fullHp) * 0.2)) && oldValue > Int((Double(fullHp) * 0.2)) {
-                //print("\(name) taumelt!")
-                let oldName = name
-                name = "\(oldName) (taumbelt)"
-                name = name.replacingOccurrences(of: "(geschwächt)", with: "")
+               // suffix = " (taumelt)"
             }
             if hp <= 0 && oldValue > 0{
-                print("\(name) wurde besiegt")
-                hp = 0
-                let oldName = name
-                name = name.replacingOccurrences(of: "(taumbelt)", with: "")
-                name = "XXX \(oldName) XXX"
+               // suffix = " XXX(tot)XXX"
             }
         }
     }
@@ -33,28 +40,34 @@ class Enemy{
     let monsterIndex: Double //Je nach Monster ein Multiplikator
     let rare: Int // Wert 1..3, dient als multiplikator für seltene Monster
     var souls: Int // Seelen beim besiegen
+    private var suffix: String = ""
+    private var prefix: String = ""
 
     
     //let weakness: String
     
     init(name: String, rare: Int, monsterIndex: Double) {
         self.name = name
-        self.fullHp = Int(Double(lvl * 50 * rare) * monsterIndex)
+        self.fullHp = Int(Double(lvl * 10000) * monsterIndex)
         self.hp = fullHp
-        self.damage = Int(Double(lvl * 8 * rare) * monsterIndex)
-        self.defense = Int(Double(lvl * 1 * rare) * monsterIndex)
+        self.damage = Int(Double(lvl * 8) * monsterIndex)
+        self.defense = Int(Double(lvl * 2) * monsterIndex)
         self.rare = rare
-        self.souls = Int(Double(lvl * 70 * rare) * monsterIndex)
+        self.souls = Int(Double(lvl * 70) * monsterIndex)
         self.monsterIndex = monsterIndex
+    }
+    
+    var enemyForPrint: String {
+        return "\(prefix)\(name)\(suffix)"
     }
       
     func increaseLvl(_ addlvl: Int){
         lvl += addlvl-1
-        fullHp = Int(Double(addlvl * 50 * rare) * monsterIndex)
+        fullHp = Int(Double(addlvl * 10000) * monsterIndex)
         hp = fullHp
-        damage = Int(Double(addlvl * 10 * rare) * monsterIndex)
-        defense = Int(Double(addlvl * 1 * rare) * monsterIndex)
-        souls = Int(Double(addlvl * 70 * rare) * monsterIndex)
+        damage = Int(Double(addlvl * 15) * monsterIndex)
+        defense = Int(Double(addlvl * 20) * monsterIndex)
+        souls = Int(Double(addlvl * 70) * Double(rare))
         
     }
     
